@@ -1,6 +1,7 @@
 import PortalCard from "./components/PortalCard";
 import Image from "next/image";
 import { Moon } from "lucide-react";
+import NavBar from "./components/NavBar";
 
 export default function Home() {
   return (
@@ -10,7 +11,8 @@ export default function Home() {
       <div className="absolute bottom-0 right-0 w-64 h-64 bg-yellow-200 rounded-full blur-3xl opacity-30 translate-x-1/2 translate-y-1/2"></div>
       
       {/* Header */}
-      <div className="w-full max-w-5xl flex justify-between items-center relative z-10 ml-170">
+      <NavBar />
+      <div className="w-full max-w-5xl flex justify-between items-center relative  mt-10 z-10 ml-170">
         <div className="flex items-center gap-1">
           <Image 
             src="/icon.svg" 
@@ -70,7 +72,7 @@ export default function Home() {
         </div>
 
         <p className="mt-4 text-xs text-gray-400">
-          © 2024 CampusBite Central. All rights reserved.
+          © 2026 CampusBite Central. All rights reserved.
         </p>
       </footer>
     </main>
