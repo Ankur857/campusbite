@@ -1,46 +1,29 @@
-// import { auth } from "@clerk/nextjs/server";
-// import { redirect } from "next/navigation";
-// import { db } from "@/db";
-// import { users } from "@/db/schema";
-// import { eq } from "drizzle-orm";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { syncUser } from "@/lib/sync-user";
 
-// export default async function AfterLoginPage() {
-//   const { userId } = await auth();
+export default async function AfterLoginPage() {
+  const { userId } = await auth();
 
-//   if (!userId) {
-//     redirect("/");
-//   }
+  if (!userId) {
+    redirect("/");
+  }
 
-//   const user = await db.query.users.findFirst({
-//     where: eq(users.clerkId, userId),
-//   });
+  const user = await syncUser();
 
-//   if (!user) {
-//     redirect("/onboarding");
-//   }
-
-//   switch (user.role) {
-//     case "admin":
-//       redirect("/admin");
-
-//     case "user":
-//       redirect("/dashboard");
-
-//     default:
-//       redirect("/");
-//   }
-// }
+  if (!user) {
+    redirect("/");
+  }
 
 
-import { UserButton } from '@clerk/nextjs'
-import React from 'react'
+  switch (user.role) {
+    case "admin":
+      redirect("/admin");
 
-const UserPage = () => {
-  return (
-    <div>
-        <UserButton/>
-    </div>
-  )
+    case "user":
+      redirect("/dashboard");
+
+    default:
+      redirect("/");
+  }
 }
-
-export default UserPage
