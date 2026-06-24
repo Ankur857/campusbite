@@ -16,14 +16,10 @@ export default async function AfterLoginPage() {
   }
 
 
-  switch (user.role) {
-    case "admin":
-      redirect("/admin");
-
-    case "user":
-      redirect("/dashboard");
-
-    default:
-      redirect("/");
+  if (user.role === "admin") {
+    redirect("/admin");
   }
+
+  redirect("/dashboard");
+  
 }

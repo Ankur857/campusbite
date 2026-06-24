@@ -1,7 +1,23 @@
 import AdminLeftPanel from '../../components/admin/AdminLeftPanel'
 import DashBoard from "../../components/admin/DashBoard";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { db } from "@/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
-export default function AdminPage() {
+export default async function AdminPage() {
+    const { userId } = await auth();
+
+    if (!userId) redirect("/");
+
+    const user = await db.query.users.findFirst({
+        where: eq(users.clerkId, userId),
+    });
+
+    if (!user || user.role !== "admin") {
+        redirect("/dashboard");
+    }
     return (
         <div className="flex min-h-screen w-full bg-gray-50">
             <AdminLeftPanel />
