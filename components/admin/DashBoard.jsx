@@ -2,6 +2,7 @@ import StatsCard from "../admin/StatsCard";
 import RecentOrders from "../admin/RecentOrders";
 import TopItems from "../admin/TopItems";
 import Header from "../admin/Header";
+import LogOut from "../admin/SignOutButton";
 
 export default function Dashboard(){
     return (
@@ -19,6 +20,9 @@ export default function Dashboard(){
                 <div className="lg:col-span-1">
                     <TopItems />
                 </div>
+                <div className="flex justify-end mb-4">
+  <LogOut />
+</div>
             </div>
         </div>
     )

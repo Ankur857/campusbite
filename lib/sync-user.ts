@@ -5,6 +5,7 @@ import { currentUser } from "@clerk/nextjs/server";
 
 const ADMIN_EMAILS = [
   "shivangi.2428csit201@kiet.edu",
+  "ankverma72@gmail.com",
 ];
 
 export async function syncUser() {

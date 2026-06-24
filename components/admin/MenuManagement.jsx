@@ -2,62 +2,63 @@
 import { useState } from "react";
 import MenuHeader from "./MenuHeader";
 import MenuGrid from "./MenuGrid";
+import AddFoodModal from "./AddFoodModal";
 
 const foodItems = [
-  {
-    name: "Masala Dosa",
-    category: "Breakfast",
-    price: 80,
-    image: "/foods/dosa.png",
-    available: true,
-  },
+ {
+  name: "Masala Dosa",
+  category: "Breakfast",
+  price: 80,
+  image: "/dosa.jpg",
+  available: true,
+},
   {
     name: "Poha",
     category: "Breakfast",
     price: 50,
-    image: "/foods/poha.png",
+    image: "/poha.jpg",
     available: true,
   },
   {
     name: "Chole Bhature",
     category: "Main Course",
     price: 120,
-    image: "/foods/chole.png",
+    image: "/chhole.jpg",
     available: true,
   },
   {
     name: "Paneer Butter Masala",
     category: "Main Course",
     price: 180,
-    image: "/foods/paneer.png",
+    image: "/paneer.jpg",
     available: false,
   },
   {
     name: "Samosa",
     category: "Snacks",
     price: 20,
-    image: "/foods/samosa.png",
+    image: "/samosa.jpg",
     available: true,
   },
   {
     name: "Vada Pav",
     category: "Snacks",
     price: 30,
-    image: "/foods/vadapav.png",
+    image: "/vada.jpg",
     available: true,
   },
   {
     name: "Masala Chai",
     category: "Beverages",
     price: 15,
-    image: "/foods/chai.png",
+    image: "/chai.jpg",
     available: true,
   },
   {
     name: "Jalebi",
     category: "Desserts",
     price: 40,
-    image: "/foods/jalebi.png",
+    image: "/jalebi.jpg",
     available: false,
   },
 ];
@@ -65,6 +66,7 @@ const foodItems = [
 export default function MenuManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Items");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredFoods = foodItems.filter((food) => {
     const matchesSearch = food.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -80,7 +82,13 @@ export default function MenuManagement() {
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
       />
-      <MenuGrid filteredFoods={filteredFoods} />
+      <MenuGrid 
+        filteredFoods={filteredFoods} 
+        onAddFoodClick={() => setIsModalOpen(true)}
+      />
+      {isModalOpen && (
+        <AddFoodModal onClose={() => setIsModalOpen(false)} />
+      )}
     </div>
   );
 }

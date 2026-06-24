@@ -1,8 +1,10 @@
+import { UserProfile } from "@clerk/nextjs";
 import {
   Bell,
   Search,
   Flame,
 } from "lucide-react";
+import LogoutButton from "../../components/admin/SignOutButton";
 
 export default function Header() {
   return (
@@ -50,6 +52,7 @@ export default function Header() {
           <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-orange-500 to-red-600 font-semibold text-white">
             A
           </div>
+          <LogoutButton />
         </div>
       </div>
     </header>

@@ -18,7 +18,7 @@ export default function FoodCard({
         <img
           src={image}
           alt={name}
-          className="w-12 h-12 rounded-full bg-gray-100 p-2"
+          className="w-24 h-24 rounded-full bg-gray-100 p-2"
         />
 
         <div className="flex gap-3">

@@ -63,20 +63,20 @@ const AdminLeftPanel = () => {
           <span className="text-sm font-medium">Menu</span>
         </Link>
 
-        <div className={menuClass}>
+        {/* <Link href="/admin/students" className={pathname === "/admin/students" ? activeMenuClass : menuClass}>
           <Users size={20} />
           <span className="text-sm font-medium">Students</span>
-        </div>
+        </Link> */}
 
-        <div className={menuClass}>
+        <Link href="/admin/analytics" className={pathname === "/admin/analytics" ? activeMenuClass : menuClass}>
           <ChartLine size={20} />
           <span className="text-sm font-medium">Analytics</span>
-        </div>
+        </Link>
 
-        <div className={menuClass}>
+        <Link href="/admin/settings" className={pathname === "/admin/settings" ? activeMenuClass : menuClass}>
           <Settings size={20} />
           <span className="text-sm font-medium">Settings</span>
-        </div>
+        </Link>
       </div>
 
       {/* Footer */}
