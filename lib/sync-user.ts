@@ -30,6 +30,17 @@ export async function syncUser() {
 
   // 3. Agar user already hai → return it
   if (existingUser) {
+    const newRole = ADMIN_EMAILS.includes(email) ? "admin" : "user";
+
+    if (existingUser.role !== newRole) {
+      await db
+        .update(users)
+        .set({ role: newRole })
+        .where(eq(users.clerkId, clerkId));
+
+      return { ...existingUser, role: newRole };
+    }
+
     return existingUser;
   }
 
