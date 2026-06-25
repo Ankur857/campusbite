@@ -58,7 +58,7 @@ export default function HeroSection() {
                     {/* Main Image */}
                     <div className="rounded-3xl overflow-hidden shadow-2xl rotate-3 scale-110 border-4 border-white">
                         <Image
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7TqoDCJYfUWHzo0zw1FjWjs5J-NlEj-zKwCAxbBOKwqbwqv1pdrwsNxOw3IWFi3EnztgHnhjWjMLWdehkBm5LDsrvNNZ9mYygkWINIELiXhPTXSXSaObFQVOacIxR5iVclC3QdgKR9D6B1FTFtbYATg4-ZIeAtgqKs2eml7Tv7YbMTBZlgs3ZtvrLg2rcQq2bN6dioslQ3bo9zpE5KRCDO0kHAG89P4Zp8MMh-I_ozNliCu90MB-fL7LHZL69TqDo2Zb2L0bEazo"
+                            src="/hero-food.jpg"
                             alt="Campus Food"
                             width={1000}
                             height={700}

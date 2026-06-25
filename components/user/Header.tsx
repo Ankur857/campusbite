@@ -25,22 +25,7 @@ export default function Header() {
           </h1>
         </div>
 
-        {/* Search */}
-        <div className="hidden flex-1 px-8 md:block">
-          <div className="relative mx-auto max-w-md">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={16}
-            />
-
-            <input
-              type="search"
-              placeholder="Search pizza, dosa, chai..."
-              className="w-full rounded-full border border-orange-100 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-400"
-            />
-          </div>
-        </div>
-
+        
         {/* Right */}
         <div className="flex items-center gap-3">
           <button className="relative grid h-10 w-10 place-items-center rounded-full border bg-white">
