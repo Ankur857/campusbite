@@ -4,10 +4,12 @@ export default function SuggestCard({
   name,
   price,
   img,
+  onAddToCart,
 }: {
   name: string;
   price: string;
   img: string;
+  onAddToCart?: () => void;
 }) {
   return (
     <div className="group overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:-translate-y-1">
@@ -27,7 +29,10 @@ export default function SuggestCard({
           <p className="text-sm text-orange-600 font-bold">{price}</p>
         </div>
 
-        <button className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white">
+        <button 
+          onClick={onAddToCart}
+          className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white hover:scale-110 transition"
+        >
           +
         </button>
       </div>

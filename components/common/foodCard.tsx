@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
 
 interface FoodItem {
     id: number;
@@ -17,6 +18,7 @@ interface FoodItem {
     rating: number;
     isVeg: boolean;
     isPopular?: boolean;
+    category?: string;
 }
 
 interface FoodCardProps {
@@ -24,6 +26,20 @@ interface FoodCardProps {
 }
 
 export default function FoodCard({ item }: FoodCardProps) {
+    const { addToCart } = useCart();
+
+    const handleAddToCart = () => {
+        addToCart({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            category: item.category || "General",
+            veg: item.isVeg,
+            image: item.image,
+            description: item.description,
+            available: true,
+        });
+    };
     return (
         <Card className="group overflow-hidden rounded-2xl border-0 py-0 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             {/* Image Section */}
@@ -92,6 +108,7 @@ export default function FoodCard({ item }: FoodCardProps) {
                     <Button
                         size="sm"
                         className="rounded-xl bg-orange-500 hover:bg-orange-600"
+                        onClick={handleAddToCart}
                     >
                         <Plus className="mr-1 h-4 w-4" />
                         Add

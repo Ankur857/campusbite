@@ -6,12 +6,14 @@ export default function CartItem({
   price,
   qty,
   image,
+  onUpdateQty,
 }: {
   title: string;
   tag: string;
   price: string;
   qty: number;
   image: string;
+  onUpdateQty?: (newQty: number) => void;
 }) {
   return (
     <div className="flex items-center gap-4 border-b p-6">
@@ -33,12 +35,12 @@ export default function CartItem({
 
       <div className="flex flex-col items-end gap-2">
         <div className="flex items-center rounded-full border bg-gray-50">
-          <button className="px-3">-</button>
+          <button onClick={() => onUpdateQty && onUpdateQty(qty - 1)} className="px-3 hover:bg-gray-100 rounded-full">-</button>
           <span className="px-2 text-sm font-bold">{qty}</span>
-          <button className="px-3">+</button>
+          <button onClick={() => onUpdateQty && onUpdateQty(qty + 1)} className="px-3 hover:bg-gray-100 rounded-full">+</button>
         </div>
 
-        <button className="text-xs text-gray-500">Remove</button>
+        <button onClick={() => onUpdateQty && onUpdateQty(0)} className="text-xs text-gray-500 hover:text-red-500">Remove</button>
       </div>
     </div>
   );
