@@ -3,30 +3,25 @@ import React, { createContext, useContext, useState } from "react";
 
 interface Order {
   id: string;
-  customer: string;
-  item: string;
-  total: string;
-  status: "New" | "Preparing" | "Ready" | "Delivered";
+  orderId: string;
+  customerName: string;
+  foodItem: string;
+  amount: number;
+  status: "new" | "preparing" | "ready" | "delivered";
+  time: string;
 }
 
 const initialOrders: Order[] = [
-  { id: "#8291", customer: "Shilpi", item: "Dosa", total: "₹150", status: "New" },
-  { id: "#8290", customer: "Shivangi", item: "Appe", total: "₹160", status: "New" },
-  { id: "#8289", customer: "Akshat", item: "Chhole Kulche", total: "₹100", status: "Preparing" },
-  { id: "#8288", customer: "Ankur", item: "Chhole Bhature", total: "₹120", status: "Ready" },
-  { id: "#8287", customer: "Solu", item: "Wrap", total: "₹120", status: "New" },
-  { id: "#8286", customer: "Shivangi", item: "Appe", total: "₹160", status: "Preparing" },
-  { id: "#8285", customer: "Akshat", item: "Chhole Kulche", total: "₹100", status: "Preparing" },
-  { id: "#8284", customer: "Ankur", item: "Chhole Bhature", total: "₹120", status: "Ready" },
-  { id: "#8283", customer: "Ankur", item: "Chhole Bhature", total: "₹120", status: "Preparing" },
-  { id: "#8282", customer: "Shilpi", item: "Dosa", total: "₹150", status: "New" },
-  { id: "#8281", customer: "Akshat", item: "Chhole Kulche", total: "₹100", status: "Preparing" },
-  { id: "#8280", customer: "Ankur", item: "Chhole Bhature", total: "₹120", status: "Ready" },
+  { id: "#8291", orderId: "order_8291", customerName: "Shilpi", foodItem: "Dosa", amount: 150, status: "new", time: "10:30 AM" },
+  { id: "#8290", orderId: "order_8290", customerName: "Shivangi", foodItem: "Appe", amount: 160, status: "new", time: "10:31 AM" },
+  { id: "#8289", orderId: "order_8289", customerName: "Akshat", foodItem: "Chhole Kulche", amount: 100, status: "preparing", time: "10:25 AM" },
+  { id: "#8288", orderId: "order_8288", customerName: "Ankur", foodItem: "Chhole Bhature", amount: 120, status: "ready", time: "10:20 AM" },
 ];
 
 interface OrdersContextType {
   orders: Order[];
   updateOrderStatus: (orderId: string, newStatus: Order["status"]) => void;
+  addOrder: (order: Order) => void;
 }
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
@@ -42,8 +37,12 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const addOrder = (order: Order) => {
+    setOrders((prev) => [order, ...prev]);
+  };
+
   return (
-    <OrdersContext.Provider value={{ orders, updateOrderStatus }}>
+    <OrdersContext.Provider value={{ orders, updateOrderStatus, addOrder }}>
       {children}
     </OrdersContext.Provider>
   );

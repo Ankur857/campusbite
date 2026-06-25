@@ -13,6 +13,7 @@ interface LiveOrder {
   estimatedTime?: number;
   progress?: number;
   pickupDetails?: string;
+  time: string;
 };
 
 const topSellingItems = [
@@ -38,28 +39,29 @@ const alerts = [
 export default function LiveOrder() {
   const { orders: contextOrders, updateOrderStatus } = useOrders();
   const [liveOrders, setLiveOrders] = useState<LiveOrder[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
 
   // Convert context orders to live orders format
   useEffect(() => {
     const converted: LiveOrder[] = contextOrders.map((order) => {
       let status: LiveOrder["status"] = "new";
-      if (order.status === "Preparing") status = "preparing";
-      if (order.status === "Ready") status = "ready";
+      if (order.status === "preparing") status = "preparing";
+      if (order.status === "ready") status = "ready";
+      if (order.status === "delivered") return null;
       
       return {
         id: order.id,
-        customerName: order.customer,
-        foodItem: order.item,
-        amount: parseInt(order.total.replace("₹", "")),
+        customerName: order.customerName,
+        foodItem: order.foodItem,
+        amount: order.amount,
         token: status !== "new" ? `TKN-${order.id.replace("#", "").padStart(3, "0")}` : undefined,
         status,
         preparationTime: status === "preparing" ? Math.floor(Math.random() * 10) : undefined,
         estimatedTime: status === "preparing" ? 10 : undefined,
         progress: status === "preparing" ? Math.floor(Math.random() * 100) : 0,
         pickupDetails: status === "ready" ? "Counter 1" : undefined,
+        time: order.time,
       };
-    });
+    }).filter((order): order is LiveOrder => order !== null);
     setLiveOrders(converted);
   }, [contextOrders]);
 
@@ -79,20 +81,12 @@ export default function LiveOrder() {
     return () => clearInterval(interval);
   }, []);
 
-
-
   const markAsReady = (id: string) => {
-    updateOrderStatus(id, "Ready");
-    setLiveOrders((prev) =>
-      prev.map((order) =>
-        order.id === id ? { ...order, status: "ready", pickupDetails: "Counter 1" } : order
-      )
-    );
+    updateOrderStatus(id, "ready");
   };
 
   const markHandoverComplete = (id: string) => {
-    updateOrderStatus(id, "Delivered");
-    setLiveOrders((prev) => prev.filter((order) => order.id !== id));
+    updateOrderStatus(id, "delivered");
   };
 
   const newOrders = liveOrders.filter((o) => o.status === "new");
@@ -145,7 +139,7 @@ export default function LiveOrder() {
             <div className="overflow-y-auto space-y-4 pr-2 max-h-[600px]">
               {newOrders.map((order) => (
                 <div key={order.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex-shrink-0">
-                  <p className="text-xs text-gray-400 mb-2">{order.id}</p>
+                  <p className="text-xs text-gray-400 mb-2">{order.id} • {order.time}</p>
                   <p className="font-semibold text-gray-900 mb-1">{order.customerName}</p>
                   <p className="text-gray-600 mb-4">{order.foodItem}</p>
                   <div className="flex items-center justify-between">
@@ -165,7 +159,7 @@ export default function LiveOrder() {
             <div className="overflow-y-auto space-y-4 pr-2 max-h-[600px]">
               {preparingOrders.map((order) => (
                 <div key={order.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex-shrink-0">
-                  <p className="text-xs text-gray-400 mb-2">{order.id}</p>
+                  <p className="text-xs text-gray-400 mb-2">{order.id} • {order.time}</p>
                   <p className="text-gray-600 mb-1">{order.foodItem}</p>
                   <p className="text-xl font-bold text-gray-900 mb-4">₹{order.amount}</p>
                   <div className="mb-2">
@@ -197,7 +191,7 @@ export default function LiveOrder() {
             <div className="overflow-y-auto space-y-4 pr-2 max-h-[600px]">
               {readyOrders.map((order) => (
                 <div key={order.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex-shrink-0">
-                  <p className="text-xs text-gray-400 mb-2">{order.id}</p>
+                  <p className="text-xs text-gray-400 mb-2">{order.id} • {order.time}</p>
                   <p className="font-semibold text-gray-900 mb-1">{order.customerName}</p>
                   <p className="text-orange-600 font-semibold mb-2">{order.token}</p>
                   <p className="text-sm text-gray-500 mb-4">Pickup at: {order.pickupDetails}</p>

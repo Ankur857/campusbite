@@ -9,6 +9,7 @@ import {
   ChartLine,
   Settings,
   DollarSign,
+  CreditCard,
 } from "lucide-react";
 
 const AdminLeftPanel = () => {
@@ -63,14 +64,19 @@ const AdminLeftPanel = () => {
           <span className="text-sm font-medium">Menu</span>
         </Link>
 
-        {/* <Link href="/admin/students" className={pathname === "/admin/students" ? activeMenuClass : menuClass}>
+        <Link href="/admin/students" className={pathname === "/admin/students" ? activeMenuClass : menuClass}>
           <Users size={20} />
           <span className="text-sm font-medium">Students</span>
-        </Link> */}
+        </Link>
 
         <Link href="/admin/analytics" className={pathname === "/admin/analytics" ? activeMenuClass : menuClass}>
           <ChartLine size={20} />
           <span className="text-sm font-medium">Analytics</span>
+        </Link>
+
+        <Link href="/admin/payment" className={pathname === "/admin/payment" ? activeMenuClass : menuClass}>
+          <CreditCard size={20} />
+          <span className="text-sm font-medium">Payment</span>
         </Link>
 
         <Link href="/admin/settings" className={pathname === "/admin/settings" ? activeMenuClass : menuClass}>

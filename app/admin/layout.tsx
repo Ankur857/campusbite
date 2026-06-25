@@ -1,4 +1,5 @@
 import { OrdersProvider } from "@/contexts/OrdersContext";
+import { CartProvider } from "@/contexts/CartContext";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
@@ -20,5 +21,9 @@ export default async function AdminLayout({
 
   if (!user || user.role !== "admin") redirect("/dashboard");
 
-  return <OrdersProvider>{children}</OrdersProvider>;
+  return (
+    <CartProvider>
+      <OrdersProvider>{children}</OrdersProvider>
+    </CartProvider>
+  );
 }
