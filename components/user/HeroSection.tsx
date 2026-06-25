@@ -116,16 +116,14 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import {
-    Clock3,
-    MapPin,
-    ArrowRight,
-    Flame,
-} from "lucide-react";
+import { Clock3, MapPin, ArrowRight, Flame } from "lucide-react";
+import { useEffect, useState } from "react";
 import useTimer from "@/hooks/useTimer";
 
 export default function HeroSection() {
-    // Next Break Time (Example: 12:30 PM)
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
+
+  useEffect(() => {
     const breakTime = new Date();
 
     breakTime.setHours(12);
@@ -135,15 +133,18 @@ export default function HeroSection() {
     const now = new Date();
 
     if (now > breakTime) {
-        breakTime.setDate(breakTime.getDate() + 1);
+      breakTime.setDate(breakTime.getDate() + 1);
     }
 
-    const remainingSeconds = Math.floor(
-        (breakTime.getTime() - now.getTime()) / 1000
+    const diff = Math.floor(
+      (breakTime.getTime() - now.getTime()) / 1000
     );
 
-    const { formatted } = useTimer(remainingSeconds);
+    setRemainingSeconds(diff);
+  }, []);
 
+  const { formatted } = useTimer(remainingSeconds ?? 0);
+  
     return (
         <section className="relative overflow-hidden rounded-[32px] border border-orange-100 bg-gradient-to-br from-orange-50 via-orange-100 to-amber-100 shadow-xl">
             {/* Background Glow */}
