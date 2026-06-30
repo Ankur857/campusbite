@@ -1,7 +1,7 @@
 import { OrdersProvider } from "@/contexts/OrdersContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { users } from "@/db/schema/users";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
@@ -19,7 +19,7 @@ export default async function AdminLayout({
     where: eq(users.clerkId, userId),
   });
 
-  if (!user || user.role !== "admin") redirect("/dashboard");
+  if (!user || user.role !== "ADMIN") redirect("/dashboard");
 
   return (
     <CartProvider>

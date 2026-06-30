@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { users } from "@/db/schema/users";
 import { eq } from "drizzle-orm";
 import { currentUser } from "@clerk/nextjs/server";
 
@@ -31,7 +31,7 @@ export async function syncUser() {
 
   // 3. Agar user already hai → return it
   if (existingUser) {
-    const newRole = ADMIN_EMAILS.includes(email) ? "admin" : "user";
+    const newRole = ADMIN_EMAILS.includes(email) ? "ADMIN" : "USER";
 
     if (existingUser.role !== newRole) {
       await db
@@ -46,7 +46,7 @@ export async function syncUser() {
   }
 
   // 4. Role decide karo (IMPORTANT CHANGE 👇)
-  const role = ADMIN_EMAILS.includes(email) ? "admin" : "user";
+  const role = ADMIN_EMAILS.includes(email) ? "ADMIN" : "USER";
 
   // 5. Agar user nahi hai → create karo
   const newUser = await db
@@ -55,7 +55,7 @@ export async function syncUser() {
       clerkId,
       email,
       name: fullName,
-      imageUrl,
+      image: imageUrl,
       role, // 👈 dynamic role now
     })
     .returning();
