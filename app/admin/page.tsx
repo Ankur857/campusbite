@@ -3,7 +3,7 @@ import DashBoard from "../../components/admin/DashBoard";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { users } from "@/db/schema/users";
 import { eq } from "drizzle-orm";
 
 export default async function AdminPage() {
@@ -15,7 +15,7 @@ export default async function AdminPage() {
         where: eq(users.clerkId, userId),
     });
 
-    if (!user || user.role !== "admin") {
+    if (!user || user.role !== "ADMIN") {
         redirect("/dashboard");
     }
     return (
