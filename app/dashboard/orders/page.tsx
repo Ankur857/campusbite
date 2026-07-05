@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 
 type OrderStatus = "active" | "completed";
-type CookStage = 
+type CookStage =
   | "placed"
   | "confirmed"
   | "preparing"
@@ -25,44 +26,17 @@ type Order = {
   rating?: number;
 };
 
-const orders: Order[] = [
-  {
-    id: "ORD101",
-    title: "Pizza + Noodles",
-    status: "active",
-    total: 329,
-    items: 3,
-    time: "Preparing",
-    stage: "preparing",
-    etaMinutes: 22,
-    placedAt: "Today · 7:42 PM",
-    restaurant: "Tossed & Sauced",
-  },
-  {
-    id: "ORD102",
-    title: "Burger Combo",
-    status: "completed",
-    total: 199,
-    items: 2,
-    time: "Ready_for_pickup",
-    stage: "ready_for_pickup",
-    placedAt: "Yesterday · 8:10 PM",
-    restaurant: "Patty People",
-    rating: 4,
-  },
-  {
-    id: "ORD103",
-    title: "Chai + Samosa",
-    status: "completed",
-    total: 60,
-    items: 2,
-    time: "Placed",
-    stage: "placed",
-    placedAt: "Mon · 5:30 PM",
-    restaurant: "Tapri Co.",
-    rating: 5,
-  },
-];
+type DbOrder = {
+  id: string;
+  totalAmount: string;
+  status: string;
+  createdAt: string;
+  items: Array<{
+    food: {
+      name: string;
+    };
+  }>;
+};
 
 
 const Icon = {
@@ -144,8 +118,67 @@ function EtaPill({ minutes }: { minutes: number }) {
 
 
 export default function OrdersPage() {
+  const { userId } = useAuth();
   const [tab, setTab] = useState<"all" | "active" | "past">("all");
   const [query, setQuery] = useState("");
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch(`/api/orders?userId=${userId}`);
+        if (res.ok) {
+          const dbOrders: DbOrder[] = await res.json();
+
+          // Convert DB orders to display format
+          const displayOrders: Order[] = dbOrders.map((order) => {
+            // Map database status to stage and status
+            let stage: CookStage = "placed";
+            let displayStatus: OrderStatus = "active";
+
+            if (order.status === "pending" || order.status === "confirmed") {
+              stage = "placed";
+              displayStatus = "active";
+            } else if (order.status === "preparing") {
+              stage = "preparing";
+              displayStatus = "active";
+            } else if (order.status === "ready") {
+              stage = "ready_for_pickup";
+              displayStatus = "active";
+            } else if (order.status === "delivered") {
+              stage = "ready_for_pickup";
+              displayStatus = "completed";
+            } else if (order.status === "cancelled") {
+              displayStatus = "completed";
+            }
+
+            return {
+              id: order.id,
+              title: order.items.map((item) => item.food?.name || "Unknown").join(", "),
+              status: displayStatus,
+              total: parseFloat(order.totalAmount),
+              items: order.items.length,
+              time: order.status,
+              stage,
+              placedAt: new Date(order.createdAt).toLocaleString(),
+              restaurant: "Campus Canteen",
+            };
+          });
+
+          setOrders(displayOrders);
+        }
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [userId]);
 
   const filtered = useMemo(() => {
     return orders.filter((o) => {
@@ -156,10 +189,18 @@ export default function OrdersPage() {
     }).filter((o) =>
       o.title.toLowerCase().includes(query.toLowerCase())
     );
-  }, [tab, query]);
+  }, [tab, query, orders]);
 
   const active = filtered.filter((o) => o.status === "active");
   const past = filtered.filter((o) => o.status === "completed");
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FBF6EE] p-6 flex items-center justify-center">
+        <p className="text-lg text-gray-500">Loading orders...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FBF6EE] p-6 text-xl">

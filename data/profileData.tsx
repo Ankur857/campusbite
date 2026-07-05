@@ -1,44 +1,47 @@
+// Mock profile data used by the dashboard profile page
+
 export const initialUser = {
-  name: "Aarav Mehta",
-  email: "aarav.mehta@example.com",
-  phone: "+91 98765 43210",
-  bio: "Weekend home-cook, weekday food-orderer.",
-  joinedAt: "Jan 2024",
-  loyaltyTier: "Saffron",
+  id: "user_1",
+  name: "Ankur Sharma",
+  email: "ankur@example.com",
+  phone: "+91-9876543210",
+  bio: "Food lover. Coffee enthusiast. Campus rep.",
+  loyaltyTier: "Gold",
   loyaltyPoints: 1240,
 };
 
 export const initialAddresses = [
   {
-    id: "addr1",
-    label: "Home",
-    line: "B-204, Lotus Apartments",
-    city: "Mumbai",
-    pin: "400076",
+    id: "addr_1",
+    label: "Hostel Room",
+    line: "Block A, Room 203",
+    city: "Campus City",
+    pin: "560001",
     isDefault: true,
   },
   {
-    id: "addr2",
-    label: "Work",
-    line: "WeWork, BKC",
-    city: "Mumbai",
-    pin: "400051",
+    id: "addr_2",
+    label: "Parents' Home",
+    line: "12 MG Road",
+    city: "Hometown",
+    pin: "110001",
     isDefault: false,
   },
 ];
 
 export const initialPayments = [
   {
-    id: "p1",
-    type: "card",
-    label: "HDFC Credit Card",
-    detail: "•••• 4821",
+    id: "pay_1",
+    label: "Visa **** 4242",
+    detail: "Exp 12/26",
     isDefault: true,
   },
   {
-    id: "p2",
-    type: "upi",
-    label: "UPI",
-    detail: "aarav@okhdfc",
+    id: "pay_2",
+    label: "UPI - ankur@bank",
+    detail: "UPI",
+    isDefault: false,
   },
 ];
+
+export default null;

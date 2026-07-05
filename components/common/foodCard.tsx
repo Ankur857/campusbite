@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Star, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import {
     Card,
@@ -28,17 +29,23 @@ interface FoodCardProps {
 export default function FoodCard({ item }: FoodCardProps) {
     const { addToCart } = useCart();
 
-    const handleAddToCart = () => {
-        addToCart({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            category: item.category || "General",
-            veg: item.isVeg,
-            image: item.image,
-            description: item.description,
-            available: true,
-        });
+    const handleAddToCart = async () => {
+        try {
+            await addToCart({
+                id: String(item.id),
+                name: item.name,
+                price: item.price,
+                category: item.category || "General",
+                veg: item.isVeg,
+                image: item.image,
+                description: item.description,
+                available: true,
+            });
+            toast.success(`${item.name} added to cart!`);
+        } catch (error) {
+            console.error("Failed to add to cart:", error);
+            toast.error("Failed to add item to cart");
+        }
     };
     return (
         <Card className="group overflow-hidden rounded-2xl border-0 py-0 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
@@ -50,7 +57,7 @@ export default function FoodCard({ item }: FoodCardProps) {
                         alt={item.name}
                         fill
                         sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-                        className="object-contain p-2"
+                        className="object-cover"
                     />
                 </div>
 

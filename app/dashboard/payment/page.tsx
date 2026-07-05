@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
-import { useOrders } from "@/contexts/OrdersContext";
+import { useAuth } from "@clerk/nextjs";
 
 export default function UserPaymentPage() {
   const { cart, getCartTotal, clearCart } = useCart();
-  const { addOrder } = useOrders();
+  const { userId } = useAuth();
   const router = useRouter();
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const totalAmount = getCartTotal();
@@ -34,52 +34,71 @@ export default function UserPaymentPage() {
       return;
     }
 
+    if (!userId) {
+      alert('Please login to place an order');
+      return;
+    }
+
     try {
       console.log("Creating order for amount:", totalAmount, "INR (", totalAmount * 100, "paise)");
       
-      const res = await fetch("/dashboard/api/payment", {
+      // Create Razorpay order first
+      const razorpayRes = await fetch("/dashboard/api/payment", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           amount: totalAmount * 100, // Convert to paise
-          cartItems: cart
         }),
       });
       
-      const data = await res.json();
+      const razorpayData = await razorpayRes.json();
       
-      if (!res.ok) {
-        console.error("API Error:", data);
-        const errorMessage = data.details ? `${data.error}: ${data.details}` : (data.error || "Unknown error");
-        alert(`Failed to create order: ${errorMessage}`);
+      if (!razorpayRes.ok) {
+        console.error("Razorpay API Error:", razorpayData);
+        const errorMessage = razorpayData.details ? `${razorpayData.error}: ${razorpayData.details}` : (razorpayData.error || "Unknown error");
+        alert(`Failed to create payment order: ${errorMessage}`);
         return;
       }
       
-      console.log("Order created:", data);
+      console.log("Razorpay order created:", razorpayData);
       
       const foodNames = cart.map(item => item.name).join(', ');
       const paymentData = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_1234567890",
-        order_id: data.id,
+        order_id: razorpayData.id,
         handler: async function (response: any) {
           console.log("Payment Success:", response);
           
-          // Create order in OrdersContext
-          addOrder({
-            id: Date.now().toString(),
-            orderId: data.id,
-            customerName: "Student User",
-            foodItem: foodNames,
-            amount: totalAmount,
-            status: "new",
-            time: new Date().toLocaleTimeString()
+          // Create order in database
+          const orderRes = await fetch("/api/orders", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId,
+              totalAmount: totalAmount.toString(),
+              items: cart.map(item => ({
+                foodId: item.id,
+                quantity: item.quantity,
+                price: item.price.toString(),
+              })),
+            }),
           });
 
-          clearCart();
-          alert("Payment Successful! Order Placed!");
-          router.push("/dashboard/menu");
+          const orderData = await orderRes.json();
+          console.log("Order response:", orderData);
+
+          if (orderRes.ok && orderData.success) {
+            clearCart();
+            alert("Payment Successful! Order Placed!");
+            router.push("/dashboard/orders");
+          } else {
+            console.error("Order creation failed:", orderData);
+            alert(`Order creation failed: ${orderData.error || "Unknown error"}. Please contact support.`);
+          }
         },
         theme: {
           color: "#C2410C"

@@ -5,25 +5,23 @@ import SuggestCard from "@/components/cart/SuggestCard";
 import CartItem from "@/components/cart/CartItem";
 import { useCart } from "@/contexts/CartContext";
 
-// Mock food items for cart
-const mockCartItems = [
-  { id: 1, name: "Cheese Burst Pizza", price: 149, category: "Main Course", veg: true, image: "/food-pizza.jpg", available: true, quantity: 1 },
-  { id: 2, name: "Veg Hakka Noodles", price: 180, category: "Main Course", veg: true, image: "/food-noodles.jpg", available: true, quantity: 2 },
-  { id: 3, name: "Chai + Samosa Combo", price: 40, category: "Snacks", veg: true, image: "/food-chai.jpg", available: true, quantity: 1 },
-];
-
 export default function CartPage() {
-  const { cart, getCartTotal, addToCart, updateQuantity, removeFromCart } = useCart();
+  const { cart, getCartTotal, addToCart, updateQuantity, removeFromCart, loading } = useCart();
   const router = useRouter();
 
-  // Initialize cart with mock items if empty (for demo purposes)
-  const cartToDisplay = cart.length > 0 ? cart : mockCartItems;
-
-  const subtotal = cart.length > 0 ? getCartTotal() : 549;
+  const subtotal = getCartTotal();
   const packing = 10;
-  const gst = 27;
-  const discount = 50;
+  const gst = Math.round(subtotal * 0.05);
+  const discount = 0;
   const total = subtotal + packing + gst - discount;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#fcfaf5] flex items-center justify-center">
+        <p className="text-lg text-gray-500">Loading cart...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#fcfaf5]">
@@ -64,7 +62,7 @@ export default function CartPage() {
             Your cart, <span className="text-orange-600">Shivangi!</span>
           </h1>
 
-          <p className="text-gray-500">{cartToDisplay.length} bites · Pickup at Main Block Canteen</p>
+          <p className="text-gray-500">{cart.length} bites · Pickup at Main Block Canteen</p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
@@ -74,23 +72,23 @@ export default function CartPage() {
               <div className="flex items-center justify-between border-b px-6 py-4">
                 <h2 className="text-lg font-bold">Items</h2>
                 <span className="rounded-full bg-gray-100 px-3 py-1 text-xs">
-                  {cartToDisplay.length} items
+                  {cart.length} items
                 </span>
               </div>
 
-              {cartToDisplay.map((item) => (
+              {cart.map((item) => (
                 <CartItem
-                  key={item.id}
+                  key={item.cartItemId || item.id}
                   title={item.name}
                   tag={`${item.category} · ${item.veg ? "Veg" : "Non-Veg"}`}
                   price={`₹${item.price}`}
                   qty={item.quantity}
                   image={item.image}
                   onUpdateQty={(newQty: number) => {
-                    if (newQty <= 0) {
-                      removeFromCart(item.id);
-                    } else {
-                      updateQuantity(item.id, newQty);
+                    if (newQty <= 0 && item.cartItemId) {
+                      removeFromCart(item.cartItemId);
+                    } else if (item.cartItemId) {
+                      updateQuantity(item.cartItemId, newQty);
                     }
                   }}
                 />
@@ -121,10 +119,6 @@ export default function CartPage() {
                 <span className="font-semibold text-black">₹{subtotal}</span>
               </div>
 
-              <div className="mt-2 flex justify-between text-sm text-green-600 font-semibold">
-                <span>BITE50 applied</span>
-                <span>- ₹{discount}</span>
-              </div>
 
               <div className="mt-2 flex justify-between text-sm text-gray-500">
                 <span>Packing</span>
@@ -169,12 +163,6 @@ export default function CartPage() {
             Hand-picked add-ons students grab with this order.
           </p>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <SuggestCard name="Momos" price="₹100" img="/momos.jpg" onAddToCart={() => addToCart({ id: 4, name: "Momos", price: 100, category: "Snacks", veg: true, image: "/momos.jpg", available: true })} />
-            <SuggestCard name="Burger" price="₹59" img="/hero-food.jpg" onAddToCart={() => addToCart({ id: 5, name: "Burger", price: 59, category: "Snacks", veg: true, image: "/hero-food.jpg", available: true })} />
-            <SuggestCard name="Masala Chai" price="₹20" img="/food-chai.jpg" onAddToCart={() => addToCart({ id: 6, name: "Masala Chai", price: 20, category: "Beverages", veg: true, image: "/food-chai.jpg", available: true })} />
-            <SuggestCard name="Samosa" price="₹15" img="/samosa.jpg" onAddToCart={() => addToCart({ id: 7, name: "Samosa", price: 15, category: "Snacks", veg: true, image: "/samosa.jpg", available: true })} />
-          </div>
         </div>
       </main>
 
