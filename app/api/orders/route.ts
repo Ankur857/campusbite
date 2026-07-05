@@ -44,7 +44,7 @@ export async function GET(req: Request) {
 
     // Get order items for each order
     const ordersWithItems = await Promise.all(
-      results.map(async (result) => {
+      results.map(async (result: any) => {
         const items = await db
           .select({
             id: orderItems.id,

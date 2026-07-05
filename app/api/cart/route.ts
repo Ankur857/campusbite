@@ -57,7 +57,7 @@ export async function GET(req: Request) {
 
     console.log("Cart items:", items);
 
-    const result = items.map((item) => ({
+    const result = items.map((item: any) => ({
       ...item.food,
       quantity: item.cartItem.quantity,
       cartItemId: item.cartItem.id,

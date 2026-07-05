@@ -29,7 +29,7 @@ export async function GET(req: Request) {
     const data = await query;
 
     return NextResponse.json(
-      data.map((item) => ({
+      data.map((item: any) => ({
         ...item.food,
         category: item.category,
       }))

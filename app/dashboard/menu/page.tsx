@@ -174,14 +174,11 @@ export default function MenuPage() {
                 name: item.name,
                 price: parseFloat(item.price),
                 category: item.category?.name || "",
-                veg: item.isVeg,
+                isVeg: item.isVeg,
                 image: item.image,
                 description: item.description,
-                available: item.available,
-                bestseller: item.isPopular,
-                rating: parseFloat(item.rating),
-                votes: item.ratingCount,
-                time: `${item.prepTime} mins`
+                isPopular: item.isPopular,
+                rating: parseFloat(item.rating)
               }} 
             />
           ))}

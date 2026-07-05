@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 
 interface FoodItem {
-    id: number;
+    id: string;
     name: string;
     description: string;
     price: number;
@@ -32,7 +32,7 @@ export default function FoodCard({ item }: FoodCardProps) {
     const handleAddToCart = async () => {
         try {
             await addToCart({
-                id: String(item.id),
+                id: item.id,
                 name: item.name,
                 price: item.price,
                 category: item.category || "General",

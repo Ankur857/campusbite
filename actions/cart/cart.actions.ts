@@ -101,7 +101,7 @@ export async function getCartCount() {
 
     return items.reduce(
 
-        (acc,item)=>acc+item.quantity,
+        (acc: number, item: any) => acc + item.quantity,
 
         0
 
@@ -115,9 +115,9 @@ export async function getCartTotal() {
 
     return items.reduce(
 
-        (total,item)=>
+        (total: number, item: any) =>
 
-        total+
+        total +
 
         Number(item.priceAtAddition)
 

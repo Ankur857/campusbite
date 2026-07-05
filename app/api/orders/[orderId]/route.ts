@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/db";
 import { orders, orderItems, foods, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { orderId: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
   try {
-    const { orderId } = params;
+    const { orderId } = await params;
 
     const [orderResult] = await db
       .select({
@@ -35,7 +35,7 @@ export async function GET(
     return NextResponse.json({
       ...orderResult.order,
       user: orderResult.user,
-      items: items.map((i) => ({
+      items: items.map((i: any) => ({
         ...i.orderItem,
         food: i.food,
       })),
