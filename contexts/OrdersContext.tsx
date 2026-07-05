@@ -1,48 +1,110 @@
 "use client"
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+
+interface OrderItem {
+  id: string;
+  foodId: string;
+  quantity: number;
+  price: string;
+}
 
 interface Order {
   id: string;
-  orderId: string;
-  customerName: string;
-  foodItem: string;
-  amount: number;
-  status: "new" | "preparing" | "ready" | "delivered";
-  time: string;
+  userId: string;
+  totalAmount: string;
+  status: "pending" | "confirmed" | "preparing" | "ready" | "delivered" | "cancelled";
+  tokenNumber?: number | null;
+  prepTime?: number | null;
+  pickupDetails?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user?: { name: string; email: string };
+  items?: OrderItem[];
 }
-
-const initialOrders: Order[] = [
-  { id: "#8291", orderId: "order_8291", customerName: "Shilpi", foodItem: "Dosa", amount: 150, status: "new", time: "10:30 AM" },
-  { id: "#8290", orderId: "order_8290", customerName: "Shivangi", foodItem: "Appe", amount: 160, status: "new", time: "10:31 AM" },
-  { id: "#8289", orderId: "order_8289", customerName: "Akshat", foodItem: "Chhole Kulche", amount: 100, status: "preparing", time: "10:25 AM" },
-  { id: "#8288", orderId: "order_8288", customerName: "Ankur", foodItem: "Chhole Bhature", amount: 120, status: "ready", time: "10:20 AM" },
-];
 
 interface OrdersContextType {
   orders: Order[];
-  updateOrderStatus: (orderId: string, newStatus: Order["status"]) => void;
-  addOrder: (order: Order) => void;
+  loading: boolean;
+  refreshOrders: () => Promise<void>;
+  updateOrderStatus: (orderId: string, newStatus: Order["status"], tokenNumber?: number, pickupDetails?: string) => Promise<void>;
+  addOrder: (orderData: any) => Promise<void>;
 }
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const updateOrderStatus = (orderId: string, newStatus: Order["status"]) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
+  const refreshOrders = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/orders");
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data);
+      }
+    } catch (e) {
+      console.error("Failed to fetch orders", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const addOrder = (order: Order) => {
-    setOrders((prev) => [order, ...prev]);
+  const updateOrderStatus = async (
+    orderId: string, 
+    newStatus: Order["status"], 
+    tokenNumber?: number, 
+    pickupDetails?: string
+  ) => {
+    try {
+      const res = await fetch("/api/orders", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId,
+          status: newStatus,
+          tokenNumber,
+          pickupDetails,
+        }),
+      });
+      if (res.ok) {
+        await refreshOrders();
+      }
+    } catch (e) {
+      console.error("Failed to update order", e);
+    }
   };
+
+  const addOrder = async (orderData: any) => {
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+      if (res.ok) {
+        await refreshOrders();
+      }
+    } catch (e) {
+      console.error("Failed to add order", e);
+    }
+  };
+
+  useEffect(() => {
+    refreshOrders();
+    
+    // Poll for new orders every 5 seconds for real-time updates
+    const interval = setInterval(refreshOrders, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <OrdersContext.Provider value={{ orders, updateOrderStatus, addOrder }}>
+    <OrdersContext.Provider value={{ orders, loading, refreshOrders, updateOrderStatus, addOrder }}>
       {children}
     </OrdersContext.Provider>
   );

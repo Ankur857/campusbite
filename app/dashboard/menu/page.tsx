@@ -1,42 +1,95 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 
 import FoodCard from "@/components/common/foodCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { menuItems } from "@/data/menuData";
 
+interface Category {
+  id: string;
+  name: string;
+  image?: string;
+  createdAt: string;
+}
 
-const categories = [
-  "All",
-  "Breakfast",
-  "Main Course",
-  "Snacks",
-  "Pizza",
-  "Chinese",
-  "Desserts",
-  "Beverages"
-];
+interface FoodItem {
+  id: string;
+  categoryId: string;
+  name: string;
+  description: string;
+  image: string;
+  price: string;
+  rating: string;
+  ratingCount: number;
+  stock: number;
+  prepTime: number;
+  isVeg: boolean;
+  isTrending: boolean;
+  isPopular: boolean;
+  available: boolean;
+  createdAt: string;
+  updatedAt: string;
+  category?: Category;
+}
 
 export default function MenuPage() {
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [foods, setFoods] = useState<FoodItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch data
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [catRes, foodRes] = await Promise.all([
+        fetch("/api/categories"),
+        fetch("/api/foods?availableOnly=true")
+      ]);
+
+      if (catRes.ok) {
+        const cats = await catRes.json();
+        setCategories(cats);
+      }
+
+      if (foodRes.ok) {
+        const foodsData = await foodRes.json();
+        setFoods(foodsData);
+      }
+    } catch (e) {
+      console.error("Failed to fetch data", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const filteredItems = useMemo(() => {
-    return menuItems.filter((item) => {
+    return foods.filter((item) => {
       const matchesSearch =
         item.name.toLowerCase().includes(search.toLowerCase()) ||
         item.description.toLowerCase().includes(search.toLowerCase());
 
       const matchesCategory =
-        selectedCategory === "All" ||
-        item.category === selectedCategory;
+        selectedCategoryId === null || item.categoryId === selectedCategoryId;
 
       return matchesSearch && matchesCategory;
     });
-  }, [search, selectedCategory]);
+  }, [search, selectedCategoryId, foods]);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 flex items-center justify-center h-[60vh]">
+        <p className="text-lg text-gray-500">Loading menu...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-6">
@@ -71,22 +124,34 @@ export default function MenuPage() {
 
       {/* Categories */}
       <div className="flex gap-2 overflow-x-auto pb-2">
+        <Button
+          key="all"
+          variant={selectedCategoryId === null ? "default" : "outline"}
+          onClick={() => setSelectedCategoryId(null)}
+          className={`rounded-full whitespace-nowrap ${
+            selectedCategoryId === null
+              ? "bg-orange-500 hover:bg-orange-600"
+              : ""
+          }`}
+        >
+          All
+        </Button>
         {categories.map((category) => (
           <Button
-            key={category}
+            key={category.id}
             variant={
-              selectedCategory === category
+              selectedCategoryId === category.id
                 ? "default"
                 : "outline"
             }
-            onClick={() => setSelectedCategory(category)}
+            onClick={() => setSelectedCategoryId(category.id)}
             className={`rounded-full whitespace-nowrap ${
-              selectedCategory === category
+              selectedCategoryId === category.id
                 ? "bg-orange-500 hover:bg-orange-600"
                 : ""
             }`}
           >
-            {category}
+            {category.name}
           </Button>
         ))}
       </div>
@@ -101,7 +166,24 @@ export default function MenuPage() {
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {filteredItems.map((item) => (
-            <FoodCard key={item.id} item={item} />
+            // We'll map our FoodItem to the format FoodCard expects
+            <FoodCard 
+              key={item.id} 
+              item={{
+                id: item.id,
+                name: item.name,
+                price: parseFloat(item.price),
+                category: item.category?.name || "",
+                veg: item.isVeg,
+                image: item.image,
+                description: item.description,
+                available: item.available,
+                bestseller: item.isPopular,
+                rating: parseFloat(item.rating),
+                votes: item.ratingCount,
+                time: `${item.prepTime} mins`
+              }} 
+            />
           ))}
         </div>
       )}

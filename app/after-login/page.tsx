@@ -16,7 +16,7 @@ export default async function AfterLoginPage() {
   }
 
 
-  if (user.role === "admin") {
+  if (user.role?.toUpperCase() === "ADMIN") {
     redirect("/admin");
   }
 

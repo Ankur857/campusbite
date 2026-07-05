@@ -1,98 +1,65 @@
 "use client"
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useOrders } from "@/contexts/OrdersContext";
 
-interface LiveOrder {
-  id: string;
-  customerName: string;
-  foodItem: string;
-  amount: number;
-  token?: string;
-  status: "new" | "preparing" | "ready";
-  preparationTime?: number;
-  estimatedTime?: number;
-  progress?: number;
-  pickupDetails?: string;
-  time: string;
-};
-
-const topSellingItems = [
-  { name: "Chicken Biryani", sold: 45, percentage: 25 },
-  { name: "Veg Pulao", sold: 38, percentage: 21 },
-  { name: "Paneer Tikka", sold: 32, percentage: 18 },
-  { name: "Fried Rice", sold: 28, percentage: 16 },
-  { name: "Dal Makhani", sold: 22, percentage: 12 },
-];
-
-const notifications = [
-  { id: 1, message: "New order received from Canteen A", time: "2 mins ago" },
-  { id: 2, message: "Order ORD-003 will be ready in 1 min", time: "1 min ago" },
-  { id: 3, message: "Order ORD-004 picked up", time: "3 mins ago" },
-];
-
-const alerts = [
-  { id: 1, item: "Chicken", level: "Low", color: "text-amber-600" },
-  { id: 2, item: "Paneer", level: "Medium", color: "text-yellow-600" },
-  { id: 3, item: "Rice", level: "Full", color: "text-green-600" },
-];
-
 export default function LiveOrder() {
-  const { orders: contextOrders, updateOrderStatus } = useOrders();
-  const [liveOrders, setLiveOrders] = useState<LiveOrder[]>([]);
+  const { orders, loading, updateOrderStatus } = useOrders();
+  const [progress, setProgress] = useState<Record<string, number>>({});
 
-  // Convert context orders to live orders format
-  useEffect(() => {
-    const converted: LiveOrder[] = contextOrders.map((order) => {
-      let status: LiveOrder["status"] = "new";
-      if (order.status === "preparing") status = "preparing";
-      if (order.status === "ready") status = "ready";
-      if (order.status === "delivered") return null;
-      
-      return {
-        id: order.id,
-        customerName: order.customerName,
-        foodItem: order.foodItem,
-        amount: order.amount,
-        token: status !== "new" ? `TKN-${order.id.replace("#", "").padStart(3, "0")}` : undefined,
-        status,
-        preparationTime: status === "preparing" ? Math.floor(Math.random() * 10) : undefined,
-        estimatedTime: status === "preparing" ? 10 : undefined,
-        progress: status === "preparing" ? Math.floor(Math.random() * 100) : 0,
-        pickupDetails: status === "ready" ? "Counter 1" : undefined,
-        time: order.time,
-      };
-    }).filter((order): order is LiveOrder => order !== null);
-    setLiveOrders(converted);
-  }, [contextOrders]);
+  // Convert our new order statuses to LiveOrder statuses
+  const { newOrders, preparingOrders, readyOrders, completedCount } = useMemo(() => {
+    const newOrd = orders.filter((o) => o.status === "pending" || o.status === "confirmed");
+    const prepOrd = orders.filter((o) => o.status === "preparing");
+    const readyOrd = orders.filter((o) => o.status === "ready");
+    const completed = orders.filter((o) => o.status === "delivered" || o.status === "cancelled").length;
+    
+    return {
+      newOrders: newOrd,
+      preparingOrders: prepOrd,
+      readyOrders: readyOrd,
+      completedCount: completed
+    };
+  }, [orders]);
 
+  // Simulate progress bar for preparing orders
   useEffect(() => {
     const interval = setInterval(() => {
-      setLiveOrders((prev) =>
-        prev.map((order) => {
-          if (order.status === "preparing" && order.progress !== undefined) {
-            const newProgress = Math.min(order.progress + 1, 100);
-            return { ...order, progress: newProgress };
+      setProgress((prev) => {
+        const next = { ...prev };
+        preparingOrders.forEach((order) => {
+          if (!next[order.id]) {
+            next[order.id] = Math.floor(Math.random() * 50);
+          } else {
+            next[order.id] = Math.min(next[order.id] + 1, 100);
           }
-          return order;
-        })
-      );
+        });
+        return next;
+      });
     }, 1000);
-
     return () => clearInterval(interval);
-  }, []);
+  }, [preparingOrders]);
 
-  const markAsReady = (id: string) => {
-    updateOrderStatus(id, "ready");
+  const markAsPreparing = (id: string) => {
+    // Generate a random token number
+    const tokenNumber = Math.floor(Math.random() * 900) + 100;
+    updateOrderStatus(id, "preparing", tokenNumber);
+  };
+
+  const markAsReady = (id: string, tokenNumber: number) => {
+    updateOrderStatus(id, "ready", tokenNumber, "Counter 1");
   };
 
   const markHandoverComplete = (id: string) => {
     updateOrderStatus(id, "delivered");
   };
 
-  const newOrders = liveOrders.filter((o) => o.status === "new");
-  const preparingOrders = liveOrders.filter((o) => o.status === "preparing");
-  const readyOrders = liveOrders.filter((o) => o.status === "ready");
-  const completedOrders = 128 - liveOrders.length;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-lg text-gray-500">Loading orders...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col p-8 overflow-auto">
@@ -113,11 +80,11 @@ export default function LiveOrder() {
       {/* Analytics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         {[
-          { label: "Total Orders Today", value: "128", color: "bg-orange-50 text-orange-700" },
+          { label: "Total Orders Today", value: orders.length.toString(), color: "bg-orange-50 text-orange-700" },
           { label: "Orders in Progress", value: preparingOrders.length.toString(), color: "bg-amber-50 text-amber-700" },
           { label: "Ready for Pickup", value: readyOrders.length.toString(), color: "bg-green-50 text-green-700" },
-          { label: "Completed Orders", value: completedOrders.toString(), color: "bg-blue-50 text-blue-700" },
-          { label: "Revenue Today", value: "₹38,420", color: "bg-emerald-50 text-emerald-700" },
+          { label: "Completed Orders", value: completedCount.toString(), color: "bg-blue-50 text-blue-700" },
+          { label: "Revenue Today", value: "₹" + orders.reduce((sum, o) => sum + parseFloat(o.totalAmount), 0).toFixed(0), color: "bg-emerald-50 text-emerald-700" },
         ].map((stat, i) => (
           <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <p className="text-sm text-gray-500 mb-2">{stat.label}</p>
@@ -139,11 +106,16 @@ export default function LiveOrder() {
             <div className="overflow-y-auto space-y-4 pr-2 max-h-[600px]">
               {newOrders.map((order) => (
                 <div key={order.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex-shrink-0">
-                  <p className="text-xs text-gray-400 mb-2">{order.id} • {order.time}</p>
-                  <p className="font-semibold text-gray-900 mb-1">{order.customerName}</p>
-                  <p className="text-gray-600 mb-4">{order.foodItem}</p>
+                  <p className="text-xs text-gray-400 mb-2">{order.id} • {new Date(order.createdAt).toLocaleTimeString()}</p>
+                  <p className="font-semibold text-gray-900 mb-1">{order.user?.name || "Customer"}</p>
                   <div className="flex items-center justify-between">
-                    <p className="text-xl font-bold text-orange-700">₹{order.amount}</p>
+                    <p className="text-xl font-bold text-orange-700">₹{parseFloat(order.totalAmount).toFixed(0)}</p>
+                    <button 
+                      onClick={() => markAsPreparing(order.id)}
+                      className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      Start Preparing
+                    </button>
                   </div>
                 </div>
               ))}
@@ -159,20 +131,23 @@ export default function LiveOrder() {
             <div className="overflow-y-auto space-y-4 pr-2 max-h-[600px]">
               {preparingOrders.map((order) => (
                 <div key={order.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex-shrink-0">
-                  <p className="text-xs text-gray-400 mb-2">{order.id} • {order.time}</p>
-                  <p className="text-gray-600 mb-1">{order.foodItem}</p>
-                  <p className="text-xl font-bold text-gray-900 mb-4">₹{order.amount}</p>
+                  <p className="text-xs text-gray-400 mb-2">{order.id} • {new Date(order.createdAt).toLocaleTimeString()}</p>
+                  <p className="font-semibold text-gray-900 mb-1">{order.user?.name || "Customer"}</p>
+                  {order.tokenNumber && (
+                    <p className="text-orange-600 font-semibold mb-2">TKN-{order.tokenNumber}</p>
+                  )}
+                  <p className="text-xl font-bold text-gray-900 mb-4">₹{parseFloat(order.totalAmount).toFixed(0)}</p>
                   <div className="mb-2">
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-1">
-                      <span>Prep Time: {order.preparationTime} mins</span>
-                      <span>{order.progress}%</span>
+                      <span>Prep Time: {order.prepTime || 10} mins</span>
+                      <span>{progress[order.id] || 0}%</span>
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2">
-                      <div className="bg-amber-500 h-2 rounded-full transition-all" style={{ width: `${order.progress}%` }}></div>
+                      <div className="bg-amber-500 h-2 rounded-full transition-all" style={{ width: `${progress[order.id] || 0}%` }}></div>
                     </div>
                   </div>
                   <button
-                    onClick={() => markAsReady(order.id)}
+                    onClick={() => order.tokenNumber && markAsReady(order.id, order.tokenNumber)}
                     className="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl font-semibold transition-colors mt-3"
                   >
                     Mark as Ready
@@ -191,10 +166,12 @@ export default function LiveOrder() {
             <div className="overflow-y-auto space-y-4 pr-2 max-h-[600px]">
               {readyOrders.map((order) => (
                 <div key={order.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex-shrink-0">
-                  <p className="text-xs text-gray-400 mb-2">{order.id} • {order.time}</p>
-                  <p className="font-semibold text-gray-900 mb-1">{order.customerName}</p>
-                  <p className="text-orange-600 font-semibold mb-2">{order.token}</p>
-                  <p className="text-sm text-gray-500 mb-4">Pickup at: {order.pickupDetails}</p>
+                  <p className="text-xs text-gray-400 mb-2">{order.id} • {new Date(order.createdAt).toLocaleTimeString()}</p>
+                  <p className="font-semibold text-gray-900 mb-1">{order.user?.name || "Customer"}</p>
+                  {order.tokenNumber && (
+                    <p className="text-orange-600 font-semibold mb-2">TKN-{order.tokenNumber}</p>
+                  )}
+                  <p className="text-sm text-gray-500 mb-4">Pickup at: {order.pickupDetails || "Counter 1"}</p>
                   <button
                     onClick={() => markHandoverComplete(order.id)}
                     className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-xl font-semibold transition-colors"
@@ -207,10 +184,10 @@ export default function LiveOrder() {
           </div>
         </div>
 
-        {/* Right Sidebar */}
+        {/* Right Sidebar - Commented out raw data for now */}
         <div className="lg:col-span-1 space-y-6">
-          {/* Top Selling Items */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          {/* Top Selling Items - Commented out (use real data later) */}
+          {/* <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <h3 className="font-semibold text-gray-900 mb-4">Top Selling Items</h3>
             <div className="space-y-3">
               {topSellingItems.map((item, i) => (
@@ -223,10 +200,10 @@ export default function LiveOrder() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
-          {/* Recent Notifications */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          {/* Recent Notifications - Commented out (use real data later) */}
+          {/* <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <h3 className="font-semibold text-gray-900 mb-4">Recent Notifications</h3>
             <div className="space-y-3">
               {notifications.map((notif) => (
@@ -236,10 +213,10 @@ export default function LiveOrder() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
-          {/* Kitchen Alerts */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          {/* Low Stock Warnings - Commented out (use real data later) */}
+          {/* <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <h3 className="font-semibold text-gray-900 mb-4">Low Stock Warnings</h3>
             <div className="space-y-3">
               {alerts.map((alert) => (
@@ -249,7 +226,7 @@ export default function LiveOrder() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

@@ -25,9 +25,15 @@ export async function syncUser() {
   const imageUrl = clerkUser.imageUrl || null;
 
   // 2. DB me check karo
-  const existingUser = await db.query.users.findFirst({
-    where: eq(users.clerkId, clerkId),
-  });
+  let existingUser: any = null;
+  try {
+    existingUser = await db.query.users.findFirst({
+      where: eq(users.clerkId, clerkId),
+    });
+  } catch (e) {
+    console.error("Drizzle findFirst error for clerkId:", clerkId, e);
+    throw e;
+  }
 
   // 3. Agar user already hai → return it
   if (existingUser) {
