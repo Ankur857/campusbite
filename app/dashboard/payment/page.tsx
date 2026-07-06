@@ -10,7 +10,27 @@ export default function UserPaymentPage() {
   const { userId } = useAuth();
   const router = useRouter();
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
   const totalAmount = getCartTotal();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch("/api/profile");
+        if (res.ok) {
+          const data = await res.json();
+          setUserProfile(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -36,6 +56,13 @@ export default function UserPaymentPage() {
 
     if (!userId) {
       alert('Please login to place an order');
+      return;
+    }
+
+    // Check if profile is completed
+    if (!userProfile || !userProfile.name || !userProfile.phone) {
+      alert('Please complete your profile (name and phone) before placing an order');
+      router.push('/dashboard/profile');
       return;
     }
 

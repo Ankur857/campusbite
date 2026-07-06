@@ -12,11 +12,11 @@ export function ProfileHero({ user }: any) {
   return (
     <Card className="mb-6 p-6 rounded-2xl border bg-white shadow-sm">
       <div className="flex items-start justify-between">
-        
+
         {/* LEFT SIDE */}
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {user.name}
+            {user.name || "Complete your profile"}
           </h1>
 
           <p className="text-sm text-gray-500 mt-1">
@@ -25,10 +25,8 @@ export function ProfileHero({ user }: any) {
 
           <div className="mt-3 flex items-center gap-2 text-xs text-orange-600">
             <span className="px-2 py-1 rounded-full bg-orange-50 border border-orange-100">
-              {user.loyaltyTier}
+              {user.bitePoints || 0} Bite Points
             </span>
-            <span>•</span>
-            <span>{user.loyaltyPoints} pts</span>
           </div>
         </div>
 
@@ -71,14 +69,13 @@ export function PersonalTab({
 
                 <Input
                     value={draft.email}
-                    disabled={!editing}
-                    onChange={(e) => setDraft({ ...draft, email: e.target.value })}
-                    className="h-11"
+                    disabled={true}
+                    className="h-11 bg-gray-50"
                     placeholder="Email address"
                 />
 
                 <Input
-                    value={draft.phone}
+                    value={draft.phone || ""}
                     disabled={!editing}
                     onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
                     className="h-11"
