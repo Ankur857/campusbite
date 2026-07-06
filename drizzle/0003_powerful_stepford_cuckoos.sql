@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ADD COLUMN "daily_order_id" integer;

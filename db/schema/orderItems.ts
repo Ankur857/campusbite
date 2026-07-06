@@ -3,6 +3,7 @@ import {
     uuid,
     integer,
     decimal,
+    timestamp,
     index
 } from "drizzle-orm/pg-core";
 
@@ -35,6 +36,10 @@ export const orderItems = pgTable(
             precision: 10,
             scale: 2,
         }).notNull(),
+
+        createdAt: timestamp("created_at")
+            .defaultNow()
+            .notNull(),
     },
 
     (table) => ({

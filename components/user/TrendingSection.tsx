@@ -56,20 +56,14 @@ export default function TrendingSection() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-4">
-              <div>
-                <h4 className="font-semibold">
-                  {item.name}
-                </h4>
+            <div className="p-4">
+              <h4 className="font-semibold">
+                {item.name}
+              </h4>
 
-                <p className="font-bold text-orange-600">
-                  ₹{item.price}
-                </p>
-              </div>
-
-              <button className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-r from-orange-500 to-red-600 text-white transition hover:scale-110">
-                <Plus size={18} />
-              </button>
+              <p className="font-bold text-orange-600">
+                ₹{item.price}
+              </p>
             </div>
           </article>
         ))}

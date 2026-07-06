@@ -106,8 +106,12 @@ export default function LiveOrder() {
             <div className="overflow-y-auto space-y-4 pr-2 max-h-[600px]">
               {newOrders.map((order) => (
                 <div key={order.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex-shrink-0">
-                  <p className="text-xs text-gray-400 mb-2">{order.id} • {new Date(order.createdAt).toLocaleTimeString()}</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleTimeString()}</p>
+                    <p className="text-xs font-bold text-orange-600">#{order.dailyOrderId || 'N/A'}</p>
+                  </div>
                   <p className="font-semibold text-gray-900 mb-1">{order.user?.name || "Customer"}</p>
+                  <p className="text-xs text-gray-500 mb-3">{order.user?.email || ""}</p>
                   <div className="flex items-center justify-between">
                     <p className="text-xl font-bold text-orange-700">₹{parseFloat(order.totalAmount).toFixed(0)}</p>
                     <button 

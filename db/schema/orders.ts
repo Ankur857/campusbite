@@ -49,6 +49,8 @@ export const orders = pgTable(
 
         pickupDetails: varchar("pickup_details", { length: 255 }),
 
+        dailyOrderId: integer("daily_order_id"),
+
         createdAt: timestamp("created_at")
             .defaultNow()
             .notNull(),

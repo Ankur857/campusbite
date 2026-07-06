@@ -74,26 +74,6 @@ export default function QuickReorder() {
                                 ₹{item.price}
                             </p>
                         </div>
-
-                        <button
-                            className="
-    grid
-    h-12
-    w-12
-    place-items-center
-    rounded-full
-    bg-gradient-to-r
-    from-orange-500
-    to-red-600
-    text-white
-    shadow-lg
-    transition-all
-    duration-300
-    hover:scale-110
-    hover:shadow-xl
-  "
-                        >              <Plus size={18} />
-                        </button>
                     </div>
                 ))}
             </div>

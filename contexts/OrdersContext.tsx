@@ -16,6 +16,7 @@ interface Order {
   tokenNumber?: number | null;
   prepTime?: number | null;
   pickupDetails?: string | null;
+  dailyOrderId?: number | null;
   createdAt: string;
   updatedAt: string;
   user?: { name: string; email: string };

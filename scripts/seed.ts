@@ -10,6 +10,21 @@ const sql = neon(process.env.DATABASE_URL!);
 async function seed() {
   console.log("Starting seed...");
 
+  // Run migration if needed
+  try {
+    await sql`ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "daily_order_id" integer`;
+    console.log("Migration applied successfully for orders.daily_order_id");
+  } catch (error) {
+    console.log("Migration may already exist or failed:", error);
+  }
+
+  try {
+    await sql`ALTER TABLE "order_items" ADD COLUMN IF NOT EXISTS "created_at" timestamp DEFAULT now() NOT NULL`;
+    console.log("Migration applied successfully for order_items.created_at");
+  } catch (error) {
+    console.log("Migration may already exist or failed:", error);
+  }
+
   // Clear existing data
   await sql`DELETE FROM order_items`;
   await sql`DELETE FROM orders`;

@@ -22,6 +22,20 @@
       "when": 1783169650643,
       "tag": "0002_lively_husk",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783361200205,
+      "tag": "0003_powerful_stepford_cuckoos",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783361796095,
+      "tag": "0004_cooing_franklin_storm",
+      "breakpoints": true
     }
   ]
 }

@@ -118,7 +118,7 @@ export default function UserPaymentPage() {
           const orderData = await orderRes.json();
           console.log("Order response:", orderData);
 
-          if (orderRes.ok && orderData.success) {
+          if (orderRes.ok) {
             clearCart();
             alert("Payment Successful! Order Placed!");
             router.push("/dashboard/orders");
