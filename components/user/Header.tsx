@@ -18,16 +18,11 @@ export default function Header() {
 
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-white shadow-lg">
-            <Flame size={18} />
-          </div>
-
-          <h1 className="text-2xl font-black tracking-tight">
-            campus
-            <span className="text-orange-600">
-              BITE
-            </span>
-          </h1>
+          <img
+            src="/green-chilli-logo.png"
+            alt="Green Chilli Cafe Logo"
+            className="h-10 object-contain"
+          />
         </div>
 
         

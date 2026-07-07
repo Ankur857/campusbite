@@ -22,14 +22,15 @@ const AdminLeftPanel = () => {
       {/* Logo */}
       <div className="flex items-center gap-3 mb-8">
         <Image
-          src="/logo.svg"
-          alt="CampusBite Logo"
-          width={40}
-          height={40}
+          src="/green-chilli-logo.png"
+          alt="Green Chilli Cafe Logo"
+          width={50}
+          height={50}
+          className="object-contain"
         />
         <div>
-          <h1 className="text-xl font-bold text-orange-800">
-            CampusBite
+          <h1 className="text-lg font-bold text-green-700">
+            Green Chilli
           </h1>
           <p className="text-xs text-gray-500">
             Admin Portal

@@ -14,9 +14,13 @@ export default function Navbar() {
 
         <Link
           href="/"
-          className="font-bold text-2xl text-orange-800"
+          className="flex items-center gap-2"
         >
-          CampusBite
+          <img
+            src="/green-chilli-logo.png"
+            alt="Green Chilli Cafe Logo"
+            className="h-10 object-contain"
+          />
         </Link>
 
         <div className="hidden md:flex gap-8">

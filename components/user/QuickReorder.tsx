@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { Plus, Repeat } from "lucide-react";
+import { Repeat } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { useCart } from "@/contexts/CartContext";
 import { useEffect, useState } from "react";
@@ -91,7 +90,7 @@ export default function QuickReorder() {
         <div className="h-10 w-48 bg-gray-200 rounded-md mb-6" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-40 bg-gray-100 rounded-3xl" />
+            <div key={i} className="h-20 bg-gray-100 rounded-2xl" />
           ))}
         </div>
       </section>
@@ -128,55 +127,45 @@ export default function QuickReorder() {
         {items.map((item) => (
           <div
             key={item.id}
-            onClick={() => handleReorder(item)}
             className="
-              group
               flex
               items-center
-              gap-5
-              rounded-3xl
+              justify-between
+              rounded-2xl
               border
               border-orange-100
               bg-white
-              p-5
-              lg:p-6
+              p-4
+              shadow-sm
               transition-all
-              duration-300
-              hover:-translate-y-1
-              hover:shadow-2xl
-              cursor-pointer
+              hover:shadow-md
             "
           >
-            <div className="relative h-28 w-28 lg:h-32 lg:w-32 overflow-hidden rounded-3xl bg-gray-50 flex-shrink-0">
-              <Image
-                src={item.image}
-                alt={item.name}
-                fill
-                className="object-cover transition-all duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-3xl">
-                <Plus size={28} className="text-white" />
-              </div>
-            </div>
+            <h4 className="font-bold text-gray-800 text-base truncate pr-2">
+              {item.name}
+            </h4>
 
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-gray-400 truncate">
-                Last ordered • {item.lastOrdered}
-              </p>
-
-              <h4 className="text-lg font-bold text-gray-900 truncate mt-1">
-                {item.name}
-              </h4>
-
-              <div className="mt-2 flex items-center justify-between">
-                <p className="text-lg font-extrabold text-orange-600">
-                  ₹{item.price}
-                </p>
-                <span className="text-xs font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-full group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                  Add +
-                </span>
-              </div>
-            </div>
+            <button
+              onClick={() => handleReorder(item)}
+              className="
+                px-3
+                py-1.5
+                text-xs
+                font-bold
+                text-orange-600
+                bg-orange-50
+                hover:bg-orange-600
+                hover:text-white
+                rounded-xl
+                border
+                border-orange-100
+                transition-colors
+                cursor-pointer
+                flex-shrink-0
+              "
+            >
+              Add +
+            </button>
           </div>
         ))}
       </div>

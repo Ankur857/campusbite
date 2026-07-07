@@ -11,72 +11,113 @@ const sql = neon(process.env.DATABASE_URL!);
 
 // Get all orders (for admin) or user orders
 export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
-    const status = searchParams.get("status");
+  let retries = 0;
+  const maxRetries = 3;
+  
+  while (retries < maxRetries) {
+    try {
+      const { searchParams } = new URL(req.url);
+      const userId = searchParams.get("userId");
+      const status = searchParams.get("status");
 
-    let query = db
-      .select({
-        order: orders,
-        user: users,
-      })
-      .from(orders)
-      .leftJoin(users, eq(orders.userId, users.id))
-      .orderBy(desc(orders.createdAt));
+      let query = db
+        .select({
+          order: orders,
+          user: users,
+        })
+        .from(orders)
+        .leftJoin(users, eq(orders.userId, users.id))
+        .orderBy(desc(orders.createdAt));
 
-    if (userId) {
-      // If userId is a Clerk ID (not a UUID), look it up
-      if (!userId.includes('-')) {
-        const user = await db
-          .select()
-          .from(users)
-          .where(eq(users.clerkId, userId))
-          .limit(1);
-        if (user.length > 0) {
-          query = query.where(eq(orders.userId, user[0].id));
+      if (userId) {
+        // If userId is a Clerk ID (not a UUID), look it up
+        if (!userId.includes('-')) {
+          const user = await db
+            .select()
+            .from(users)
+            .where(eq(users.clerkId, userId))
+            .limit(1);
+          if (user.length > 0) {
+            query = query.where(eq(orders.userId, user[0].id));
+          }
+        } else {
+          query = query.where(eq(orders.userId, userId));
         }
-      } else {
-        query = query.where(eq(orders.userId, userId));
       }
+
+      if (status) {
+        query = query.where(eq(orders.status, status as any));
+      }
+
+      const results = await query;
+
+      // Get order items for each order (with retry logic for transient errors)
+      const ordersWithItems = await Promise.all(
+        results.map(async (result: any) => {
+          let itemRetries = 0;
+          const maxItemRetries = 3;
+          
+          while (itemRetries < maxItemRetries) {
+            try {
+              const items = await db
+                .select({
+                  id: orderItems.id,
+                  foodId: orderItems.foodId,
+                  quantity: orderItems.quantity,
+                  price: orderItems.price,
+                  food: foods,
+                })
+                .from(orderItems)
+                .leftJoin(foods, eq(orderItems.foodId, foods.id))
+                .where(eq(orderItems.orderId, result.order.id));
+              
+              return {
+                ...result.order,
+                user: result.user,
+                items,
+              };
+            } catch (error: any) {
+              itemRetries++;
+              if (itemRetries >= maxItemRetries) {
+                console.error(`Failed to fetch items for order ${result.order.id} after ${maxItemRetries} retries:`, error);
+                return {
+                  ...result.order,
+                  user: result.user,
+                  items: [],
+                };
+              }
+              // Wait before retrying (exponential backoff)
+              await new Promise(resolve => setTimeout(resolve, Math.pow(2, itemRetries) * 100));
+            }
+          }
+          
+          return {
+            ...result.order,
+            user: result.user,
+            items: [],
+          };
+        })
+      );
+
+      return NextResponse.json(ordersWithItems);
+    } catch (error: any) {
+      retries++;
+      if (retries >= maxRetries) {
+        console.error("Error fetching orders after retries:", error);
+        return NextResponse.json(
+          { error: "Failed to fetch orders", details: error.message },
+          { status: 500 }
+        );
+      }
+      // Wait before retrying (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, retries) * 100));
     }
-
-    if (status) {
-      query = query.where(eq(orders.status, status as any));
-    }
-
-    const results = await query;
-
-    // Get order items for each order
-    const ordersWithItems = await Promise.all(
-      results.map(async (result: any) => {
-        const items = await db
-          .select({
-            id: orderItems.id,
-            foodId: orderItems.foodId,
-            quantity: orderItems.quantity,
-            price: orderItems.price,
-            food: foods,
-          })
-          .from(orderItems)
-          .leftJoin(foods, eq(orderItems.foodId, foods.id))
-          .where(eq(orderItems.orderId, result.order.id));
-        return {
-          ...result.order,
-          user: result.user,
-          items,
-        };
-      })
-    );
-
-    return NextResponse.json(ordersWithItems);
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch orders" },
-      { status: 500 }
-    );
   }
+  
+  return NextResponse.json(
+    { error: "Failed to fetch orders" },
+    { status: 500 }
+  );
 }
 
 // Create a new order

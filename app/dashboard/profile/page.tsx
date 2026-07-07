@@ -2,15 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 import {
   ProfileHero,
   PersonalTab,
-  AddressesTab,
-  PaymentsTab,
-  PreferencesTab,
 } from "./components";
 
 export default function ProfilePage() {
@@ -18,18 +14,9 @@ export default function ProfilePage() {
   const { user: clerkUser } = useUser();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [addresses, setAddresses] = useState([]);
-  const [payments] = useState([]);
 
   const [draft, setDraft] = useState<any>(null);
   const [editing, setEditing] = useState(false);
-
-  const [prefs, setPrefs] = useState({
-    orderUpdates: true,
-    promos: false,
-    newsletter: true,
-    vegOnly: false,
-  });
 
   useEffect(() => {
     if (!userId) return;
@@ -129,47 +116,19 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#FBF6EE] p-6 ">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto space-y-6">
 
         {/* HERO */}
         <ProfileHero user={user} />
 
-        {/* TABS */}
-        <Tabs defaultValue="personal">
-
-          <TabsList className="grid grid-cols-4 mb-4">
-            <TabsTrigger value="personal">Personal</TabsTrigger>
-            <TabsTrigger value="addresses">Addresses</TabsTrigger>
-            <TabsTrigger value="payments">Payments</TabsTrigger>
-            <TabsTrigger value="prefs">Prefs</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="personal">
-            <PersonalTab
-              draft={draft}
-              setDraft={setDraft}
-              editing={editing}
-              setEditing={setEditing}
-              onSave={handleSave}
-            />
-          </TabsContent>
-
-          <TabsContent value="addresses">
-            <AddressesTab
-              addresses={addresses}
-              setAddresses={setAddresses}
-            />
-          </TabsContent>
-
-          <TabsContent value="payments">
-            <PaymentsTab payments={payments} />
-          </TabsContent>
-
-          <TabsContent value="prefs">
-            <PreferencesTab prefs={prefs} setPrefs={setPrefs} />
-          </TabsContent>
-
-        </Tabs>
+        {/* PERSONAL DETAILS ONLY */}
+        <PersonalTab
+          draft={draft}
+          setDraft={setDraft}
+          editing={editing}
+          setEditing={setEditing}
+          onSave={handleSave}
+        />
       </div>
     </div>
   );

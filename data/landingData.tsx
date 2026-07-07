@@ -43,7 +43,7 @@ export const testimonials = [
   {
     name: "Aisha Khan",
     role: "Undergraduate Student",
-    review: "CampusBite makes ordering between classes effortless — love the quick re-order feature!",
+    review: "Green Chilli Cafe makes ordering between classes effortless — love the quick re-order feature!",
   },
   {
     name: "Ravi Patel",

@@ -8,6 +8,21 @@ import CartItem from "@/components/cart/CartItem";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 
+// Helper to dynamically load the Razorpay checkout script
+const loadRazorpay = () => {
+  return new Promise((resolve) => {
+    if (typeof window !== "undefined" && (window as any).Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 export default function CartPage() {
   const { cart, getCartTotal, updateQuantity, removeFromCart, clearCart, loading } = useCart();
   const router = useRouter();
@@ -65,35 +80,96 @@ export default function CartPage() {
         return;
       }
 
-      // 2. Place order directly in DB
-      const orderRes = await fetch("/api/orders", {
+      // 2. Load Razorpay SDK
+      const rzpLoaded = await loadRazorpay();
+      if (!rzpLoaded) {
+        toast.error("Failed to load payment gateway. Please check your internet connection.");
+        setPlacingOrder(false);
+        return;
+      }
+
+      // 3. Create Razorpay order on backend
+      const amountPaise = Math.round(total * 100);
+      const paymentRes = await fetch("/dashboard/api/payment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId,
-          totalAmount: total.toString(),
-          items: cart.map(item => ({
-            foodId: item.id,
-            quantity: item.quantity,
-            price: item.price.toString(),
-          })),
-        }),
+        body: JSON.stringify({ amount: amountPaise }),
       });
 
-      const orderData = await orderRes.json();
-      if (orderRes.ok) {
-        await clearCart();
-        toast.success("Order Placed Successfully!");
-        router.push("/dashboard/orders");
-      } else {
-        toast.error(orderData.error || "Failed to place order");
+      if (!paymentRes.ok) {
+        const errData = await paymentRes.json();
+        throw new Error(errData.error || "Failed to initialize payment");
       }
+
+      const rzpOrder = await paymentRes.json();
+
+      // 4. Open Razorpay Checkout modal
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_T5knzRZC3XzmIg",
+        amount: rzpOrder.amount,
+        currency: rzpOrder.currency || "INR",
+        name: "Green Chilli Cafe",
+        description: "Delicious Green Chilli Bites",
+        order_id: rzpOrder.id,
+        handler: async function (response: any) {
+          try {
+            setPlacingOrder(true);
+            
+            // 5. Place order directly in DB upon successful payment
+            const orderRes = await fetch("/api/orders", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                userId,
+                totalAmount: total.toString(),
+                items: cart.map(item => ({
+                  foodId: item.id,
+                  quantity: item.quantity,
+                  price: item.price.toString(),
+                })),
+              }),
+            });
+
+            const orderData = await orderRes.json();
+            if (orderRes.ok) {
+              await clearCart();
+              toast.success("Order Placed Successfully!");
+              router.push("/dashboard/orders");
+            } else {
+              toast.error(orderData.error || "Failed to place order");
+            }
+          } catch (err: any) {
+            console.error("Error creating order after payment:", err);
+            toast.error("Payment successful, but failed to save order to database.");
+          } finally {
+            setPlacingOrder(false);
+          }
+        },
+        prefill: {
+          name: profileData.name,
+          contact: profileData.phone,
+          email: user?.emailAddresses?.[0]?.emailAddress || "",
+        },
+        theme: {
+          color: "#EA580C",
+        },
+        modal: {
+          ondismiss: function () {
+            setPlacingOrder(false);
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+
     } catch (error: any) {
       console.error("Error placing order:", error);
       toast.error(error.message || "Something went wrong. Please try again.");
-    } finally {
       setPlacingOrder(false);
     }
   };
@@ -114,12 +190,11 @@ export default function CartPage() {
       <header className="sticky top-0 z-40 border-b bg-[#fcfaf5]/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-white shadow-lg">
-              🍔
-            </div>
-            <div className="text-xl font-extrabold">
-              campus<span className="text-orange-600">BITE</span>
-            </div>
+            <img
+              src="/green-chilli-logo.png"
+              alt="Green Chilli Cafe Logo"
+              className="h-10 object-contain"
+            />
           </div>
 
           <div className="flex items-center gap-3">
@@ -249,7 +324,7 @@ export default function CartPage() {
       </main>
 
       <footer className="border-t py-6 text-center text-xs text-gray-500">
-        campusBITE · Built for hungry students, by hungry students.
+        Green Chilli Cafe · Built for hungry students, by hungry students.
       </footer>
     </div>
   );

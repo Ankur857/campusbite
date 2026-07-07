@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { Plus, Star, TrendingUp } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
@@ -29,9 +28,9 @@ export default function TrendingSection() {
         const res = await fetch("/api/foods?availableOnly=true");
         if (res.ok) {
           const data = await res.json();
-          // Filter foods that have isTrending set to true
+          // Filter foods that have isTrending set to true and limit to max 4 items
           const trending = data.filter((food: any) => food.isTrending === true);
-          setItems(trending);
+          setItems(trending.slice(0, 4));
         }
       } catch (error) {
         console.error("Failed to fetch trending foods:", error);
@@ -66,7 +65,7 @@ export default function TrendingSection() {
         <div className="h-10 w-64 bg-gray-200 rounded-md mb-6" />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="aspect-[4/3] bg-gray-100 rounded-[28px]" />
+            <div key={i} className="h-20 bg-gray-100 rounded-2xl" />
           ))}
         </div>
       </section>
@@ -103,45 +102,45 @@ export default function TrendingSection() {
         {items.map((item) => (
           <article
             key={item.id}
-            onClick={() => handleAddToCart(item)}
-            className="group overflow-hidden rounded-[28px] border border-orange-100 bg-white transition-all hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+            className="
+              flex
+              items-center
+              justify-between
+              rounded-2xl
+              border
+              border-orange-100
+              bg-white
+              p-4
+              shadow-sm
+              transition-all
+              hover:shadow-md
+            "
           >
-            <div className="relative aspect-[4/3] overflow-hidden">
-              <Image
-                src={item.image}
-                alt={item.name}
-                fill
-                className="object-cover transition duration-500 group-hover:scale-110"
-              />
+            <h4 className="font-bold text-gray-800 text-base truncate pr-2">
+              {item.name}
+            </h4>
 
-              <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-bold text-orange-600 shadow">
-                {item.category?.name || "Popular"}
-              </span>
-
-              <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/80 px-2 py-1 text-xs text-white">
-                <Star
-                  size={12}
-                  fill="orange"
-                />
-                {parseFloat(item.rating || "0").toFixed(1)}
-              </div>
-            </div>
-
-            <div className="p-4 flex items-center justify-between">
-              <div>
-                <h4 className="font-semibold text-gray-900 truncate max-w-[150px]">
-                  {item.name}
-                </h4>
-
-                <p className="font-bold text-orange-600">
-                  ₹{parseFloat(item.price).toFixed(0)}
-                </p>
-              </div>
-
-              <span className="text-xs font-bold text-orange-600 bg-orange-50 px-3 py-2 rounded-full group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                Add +
-              </span>
-            </div>
+            <button
+              onClick={() => handleAddToCart(item)}
+              className="
+                px-3
+                py-1.5
+                text-xs
+                font-bold
+                text-orange-600
+                bg-orange-50
+                hover:bg-orange-600
+                hover:text-white
+                rounded-xl
+                border
+                border-orange-100
+                transition-colors
+                cursor-pointer
+                flex-shrink-0
+              "
+            >
+              Add +
+            </button>
           </article>
         ))}
       </div>

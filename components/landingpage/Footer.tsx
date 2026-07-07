@@ -8,9 +8,11 @@ export default function Footer() {
         <div className="grid md:grid-cols-3 gap-10">
           {/* Brand */}
           <div>
-            <h3 className="text-2xl font-bold text-orange-600">
-              CampusBite
-            </h3>
+            <img
+              src="/green-chilli-logo.png"
+              alt="Green Chilli Cafe Logo"
+              className="h-10 object-contain"
+            />
 
             <p className="mt-4 text-gray-600 max-w-sm">
               Skip the queue, order ahead, and grab your food
@@ -50,7 +52,7 @@ export default function Footer() {
             <div className="space-y-3 text-gray-600">
               <div className="flex items-center gap-2">
                 <Mail size={18} />
-                <span>support@campusbite.com</span>
+                <span>support@greenchillicafe.com</span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -69,7 +71,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-gray-500 text-sm">
-            © 2026 CampusBite. All rights reserved.
+            © 2026 Green Chilli Cafe. All rights reserved.
           </p>
 
           <div className="flex gap-6 text-sm">
