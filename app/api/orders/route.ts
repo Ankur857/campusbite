@@ -197,7 +197,7 @@ export async function POST(req: Request) {
 
     console.log("Order created:", newOrder.id);
 
-    const orderItemsWithOrderId = orderItemsData.map((item) => ({
+    const orderItemsWithOrderId = orderItemsData.map((item:any) => ({
       ...item,
       orderId: newOrder.id,
     }));
