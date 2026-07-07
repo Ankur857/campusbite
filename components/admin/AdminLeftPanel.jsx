@@ -74,10 +74,6 @@ const AdminLeftPanel = () => {
           <span className="text-sm font-medium">Analytics</span>
         </Link>
 
-        <Link href="/admin/payment" className={pathname === "/admin/payment" ? activeMenuClass : menuClass}>
-          <CreditCard size={20} />
-          <span className="text-sm font-medium">Payment</span>
-        </Link>
 
         <Link href="/admin/settings" className={pathname === "/admin/settings" ? activeMenuClass : menuClass}>
           <Settings size={20} />

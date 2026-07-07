@@ -1,19 +1,102 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useAuth, useUser } from "@clerk/nextjs";
 import SuggestCard from "@/components/cart/SuggestCard";
 import CartItem from "@/components/cart/CartItem";
 import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 
 export default function CartPage() {
-  const { cart, getCartTotal, addToCart, updateQuantity, removeFromCart, loading } = useCart();
+  const { cart, getCartTotal, updateQuantity, removeFromCart, clearCart, loading } = useCart();
   const router = useRouter();
+  const { userId } = useAuth();
+  const { user } = useUser();
+  
+  const [profileName, setProfileName] = useState("");
+  const [placingOrder, setPlacingOrder] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/profile")
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.name) {
+          setProfileName(data.name.split(" ")[0]);
+        }
+      })
+      .catch(err => console.error("Error fetching profile:", err));
+  }, []);
+
+  const displayName = profileName || user?.firstName || "Student";
 
   const subtotal = getCartTotal();
   const packing = 10;
   const gst = Math.round(subtotal * 0.05);
   const discount = 0;
   const total = subtotal + packing + gst - discount;
+
+  const handlePlaceOrder = async () => {
+    if (!userId) {
+      toast.error("Please login to place an order");
+      return;
+    }
+
+    if (cart.length === 0) {
+      toast.error("Your cart is empty!");
+      return;
+    }
+
+    setPlacingOrder(true);
+    try {
+      // 1. Fetch user profile to verify name and phone number
+      const profileRes = await fetch("/api/profile");
+      if (!profileRes.ok) {
+        toast.error("Failed to verify profile. Please try again.");
+        setPlacingOrder(false);
+        return;
+      }
+      
+      const profileData = await profileRes.json();
+      if (!profileData || !profileData.name || !profileData.phone) {
+        toast.error("Please complete your profile (name and phone number) before placing an order.");
+        router.push("/dashboard/profile");
+        setPlacingOrder(false);
+        return;
+      }
+
+      // 2. Place order directly in DB
+      const orderRes = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          totalAmount: total.toString(),
+          items: cart.map(item => ({
+            foodId: item.id,
+            quantity: item.quantity,
+            price: item.price.toString(),
+          })),
+        }),
+      });
+
+      const orderData = await orderRes.json();
+      if (orderRes.ok) {
+        await clearCart();
+        toast.success("Order Placed Successfully!");
+        router.push("/dashboard/orders");
+      } else {
+        toast.error(orderData.error || "Failed to place order");
+      }
+    } catch (error: any) {
+      console.error("Error placing order:", error);
+      toast.error(error.message || "Something went wrong. Please try again.");
+    } finally {
+      setPlacingOrder(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -22,6 +105,8 @@ export default function CartPage() {
       </div>
     );
   }
+
+  const initial = user?.firstName?.[0]?.toUpperCase() || user?.emailAddresses?.[0]?.emailAddress?.[0]?.toUpperCase() || "S";
 
   return (
     <div className="min-h-screen bg-[#fcfaf5]">
@@ -43,7 +128,7 @@ export default function CartPage() {
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-orange-500" />
             </button>
             <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-orange-500 to-red-600 text-white font-bold">
-              A
+              {initial}
             </div>
           </div>
         </div>
@@ -59,7 +144,7 @@ export default function CartPage() {
           </div>
 
           <h1 className="mt-4 text-4xl font-extrabold">
-            Your cart, <span className="text-orange-600">Shivangi!</span>
+            Your cart, <span className="text-orange-600">{displayName}!</span>
           </h1>
 
           <p className="text-gray-500">{cart.length} bites · Pickup at Main Block Canteen</p>
@@ -76,23 +161,29 @@ export default function CartPage() {
                 </span>
               </div>
 
-              {cart.map((item) => (
-                <CartItem
-                  key={item.cartItemId || item.id}
-                  title={item.name}
-                  tag={`${item.category} · ${item.veg ? "Veg" : "Non-Veg"}`}
-                  price={`₹${item.price}`}
-                  qty={item.quantity}
-                  image={item.image}
-                  onUpdateQty={(newQty: number) => {
-                    if (newQty <= 0 && item.cartItemId) {
-                      removeFromCart(item.cartItemId);
-                    } else if (item.cartItemId) {
-                      updateQuantity(item.cartItemId, newQty);
-                    }
-                  }}
-                />
-              ))}
+              {cart.length === 0 ? (
+                <div className="p-10 text-center text-gray-500">
+                  Your cart is empty. Start adding delicious bites!
+                </div>
+              ) : (
+                cart.map((item) => (
+                  <CartItem
+                    key={item.cartItemId || item.id}
+                    title={item.name}
+                    tag={`${item.category} · ${item.veg ? "Veg" : "Non-Veg"}`}
+                    price={`₹${item.price}`}
+                    qty={item.quantity}
+                    image={item.image}
+                    onUpdateQty={(newQty: number) => {
+                      if (newQty <= 0 && item.cartItemId) {
+                        removeFromCart(item.cartItemId);
+                      } else if (item.cartItemId) {
+                        updateQuantity(item.cartItemId, newQty);
+                      }
+                    }}
+                  />
+                ))
+              )}
             </div>
 
             {/* COUPON */}
@@ -119,7 +210,6 @@ export default function CartPage() {
                 <span className="font-semibold text-black">₹{subtotal}</span>
               </div>
 
-
               <div className="mt-2 flex justify-between text-sm text-gray-500">
                 <span>Packing</span>
                 <span className="font-semibold text-black">₹{packing}</span>
@@ -135,15 +225,16 @@ export default function CartPage() {
               <div className="flex justify-between">
                 <span className="font-bold">Total</span>
                 <span className="text-3xl font-extrabold text-orange-600">
-                  ₹{total}
+                  ₹{cart.length > 0 ? total : 0}
                 </span>
               </div>
 
               <button 
-                onClick={() => router.push('/dashboard/payment')}
-                className="mt-4 w-full rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 py-4 font-bold text-white shadow-lg"
+                onClick={handlePlaceOrder}
+                disabled={cart.length === 0 || placingOrder}
+                className="mt-4 w-full rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 py-4 font-bold text-white shadow-lg disabled:from-gray-300 disabled:to-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all duration-300"
               >
-                Proceed To Pay →
+                {placingOrder ? "Placing Order..." : `Place Order (₹${cart.length > 0 ? total : 0})`}
               </button>
 
               <div className="mt-4 rounded-2xl bg-gray-100 p-4">
@@ -155,15 +246,6 @@ export default function CartPage() {
             </div>
           </aside>
         </div>
-
-        {/* SUGGESTIONS */}
-        <div className="mt-10">
-          <h2 className="text-2xl font-extrabold">Pair it with</h2>
-          <p className="mb-4 text-gray-500">
-            Hand-picked add-ons students grab with this order.
-          </p>
-
-        </div>
       </main>
 
       <footer className="border-t py-6 text-center text-xs text-gray-500">
@@ -171,4 +253,4 @@ export default function CartPage() {
       </footer>
     </div>
   );
-}
+}

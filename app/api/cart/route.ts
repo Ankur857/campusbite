@@ -259,11 +259,23 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.clerkId, userId))
+      .limit(1);
+
+    if (user.length === 0) {
+      return NextResponse.json({ success: true });
+    }
+
+    const internalUserId = user[0].id;
+
     // Get user's cart
     const userCart = await db
       .select()
       .from(cart)
-      .where(eq(cart.userId, userId))
+      .where(eq(cart.userId, internalUserId))
       .limit(1);
 
     if (userCart.length > 0) {

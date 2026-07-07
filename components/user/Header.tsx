@@ -1,4 +1,6 @@
-import { UserProfile } from "@clerk/nextjs";
+"use client";
+
+import { useUser } from "@clerk/nextjs";
 import {
   Bell,
   Search,
@@ -7,6 +9,9 @@ import {
 import LogoutButton from "../../components/admin/SignOutButton";
 
 export default function Header() {
+  const { user } = useUser();
+  const initial = user?.firstName?.[0]?.toUpperCase() || user?.emailAddresses?.[0]?.emailAddress?.[0]?.toUpperCase() || "S";
+
   return (
     <header className="sticky top-0 z-40 border-b border-orange-100 bg-[#FFF8F3]/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
@@ -35,11 +40,11 @@ export default function Header() {
           </button>
 
           <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-orange-500 to-red-600 font-semibold text-white">
-            A
+            {initial}
           </div>
           <LogoutButton />
         </div>
       </div>
     </header>
   );
-}
+}

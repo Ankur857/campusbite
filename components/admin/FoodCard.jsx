@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2, Plus, Minus } from "lucide-react";
-import { useCart } from "../../contexts/CartContext";
+import { Pencil, Trash2 } from "lucide-react";
 
 export default function FoodCard({
   id,
@@ -15,10 +14,8 @@ export default function FoodCard({
   description,
 }) {
   const [available, setAvailable] = useState(initialAvailable);
-  const { cart, addToCart, updateQuantity } = useCart();
 
-  const cartItem = cart.find(item => item.id === id);
-  const quantity = cartItem?.quantity || 0;
+  const displayCategory = typeof category === "object" ? category?.name : category;
 
   return (
     <div className="bg-white rounded-2xl p-5 shadow-sm border flex flex-col">
@@ -44,14 +41,14 @@ export default function FoodCard({
       <h3 className="font-semibold mt-4 text-gray-900">{name}</h3>
 
       <p className="text-xs font-bold text-gray-500 uppercase">
-        {category}
+        {displayCategory}
       </p>
 
       <div className="flex justify-between items-center mt-4">
         <div>
           <p className="text-xs text-gray-500">Price</p>
           <h2 className="text-2xl font-bold text-orange-700">
-            ₹{price}
+            ₹{parseFloat(price || 0).toFixed(0)}
           </h2>
         </div>
 
@@ -80,38 +77,6 @@ export default function FoodCard({
           </label>
         </div>
       </div>
-
-      <div className="mt-4">
-        {quantity === 0 ? (
-          <button
-            onClick={() => addToCart({ id, name, price, category, veg, image, description, available, bestseller: false, rating: 4.5, votes: 100, time: "15 mins" })}
-            disabled={!available}
-            className={`w-full py-2 rounded-xl font-semibold transition-all ${
-              available
-                ? "bg-orange-700 text-white hover:bg-orange-800"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-          >
-            Add to Cart
-          </button>
-        ) : (
-          <div className="flex items-center justify-between bg-orange-50 rounded-xl p-2">
-            <button
-              onClick={() => updateQuantity(id, quantity - 1)}
-              className="w-8 h-8 rounded-full bg-orange-700 text-white flex items-center justify-center hover:bg-orange-800 transition-colors"
-            >
-              <Minus size={16} />
-            </button>
-            <span className="font-semibold text-orange-700">{quantity}</span>
-            <button
-              onClick={() => updateQuantity(id, quantity + 1)}
-              className="w-8 h-8 rounded-full bg-orange-700 text-white flex items-center justify-center hover:bg-orange-800 transition-colors"
-            >
-              <Plus size={16} />
-            </button>
-          </div>
-        )}
-      </div>
     </div>
   );
-}
+}

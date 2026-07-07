@@ -1,82 +1,185 @@
+"use client";
+
 import Image from "next/image";
 import { Plus, Repeat } from "lucide-react";
-import { quickReorders } from "@/data/dashboardData";
+import { useAuth } from "@clerk/nextjs";
+import { useCart } from "@/contexts/CartContext";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+interface ReorderItem {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  lastOrdered: string;
+}
 
 export default function QuickReorder() {
+  const { userId } = useAuth();
+  const { addToCart } = useCart();
+  const [items, setItems] = useState<ReorderItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchPastOrders = async () => {
+      try {
+        const res = await fetch(`/api/orders?userId=${userId}`);
+        if (res.ok) {
+          const orders = await res.json();
+          
+          // Gather unique foods recently ordered
+          const itemsMap = new Map<string, ReorderItem>();
+          
+          // orders are already sorted desc by createdAt
+          orders.forEach((order: any) => {
+            order.items?.forEach((item: any) => {
+              if (item.food && !itemsMap.has(item.food.id)) {
+                const formattedDate = new Date(order.createdAt).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric'
+                });
+                
+                itemsMap.set(item.food.id, {
+                  id: item.food.id,
+                  name: item.food.name,
+                  price: parseFloat(item.price),
+                  image: item.food.image,
+                  lastOrdered: formattedDate,
+                });
+              }
+            });
+          });
+          
+          setItems(Array.from(itemsMap.values()).slice(0, 3));
+        }
+      } catch (error) {
+        console.error("Failed to fetch past orders for QuickReorder:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPastOrders();
+  }, [userId]);
+
+  const handleReorder = async (item: ReorderItem) => {
+    try {
+      await addToCart({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        category: "",
+        veg: true,
+        image: item.image,
+      });
+      toast.success(`Added ${item.name} to cart!`);
+    } catch (error) {
+      toast.error("Failed to add item to cart");
+    }
+  };
+
+  if (loading) {
     return (
-        <section className="mt-12">
-            <div className="mb-5 flex items-end justify-between">
-                <div>
-                    <div className="mb-2 flex items-center gap-2 text-orange-600">
-                        <Repeat size={18} />
-                        <span className="text-xs font-bold uppercase tracking-[0.15em]">
-                            Quick
-                        </span>
-                    </div>
-
-                    <h3 className="text-3xl font-black">
-                        Quick Reorder
-                    </h3>
-
-                    <p className="mt-1 text-sm text-gray-500">
-                        One tap. Same bite as last time.
-                    </p>
-                </div>
-
-                <button className="hidden font-semibold text-orange-600 sm:block">
-                    See All →
-                </button>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {quickReorders.map((item) => (
-                    <div
-                        key={item.id}
-                        className="
-    group
-    flex
-    items-center
-    gap-5
-    rounded-3xl
-    border
-    border-orange-100
-    bg-white
-    p-5
-    lg:p-6
-    transition-all
-    duration-300
-    hover:-translate-y-1
-    hover:shadow-2xl
-  "
-                    >
-                        <div className="relative h-28 w-28 lg:h-32 lg:w-32 overflow-hidden rounded-3xl">
-                            <Image
-                                src={item.image}
-                                alt={item.name}
-                                fill
-                                className="object-cover
-    transition-all
-    duration-500
-    group-hover:scale-110"
-                            />
-                        </div>
-
-                        <div className="flex-1">
-                            <p className="text-xs text-gray-500">
-                                Last ordered • {item.lastOrdered}
-                            </p>
-
-                            <h4 className="text-lg font-bold">
-                                {item.name}
-                            </h4>
-
-                            <p className="mt-1 text-lg font-extrabold text-orange-600">
-                                ₹{item.price}
-                            </p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
+      <section className="mt-12 animate-pulse">
+        <div className="h-6 w-32 bg-gray-200 rounded-md mb-4" />
+        <div className="h-10 w-48 bg-gray-200 rounded-md mb-6" />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-40 bg-gray-100 rounded-3xl" />
+          ))}
+        </div>
+      </section>
     );
+  }
+
+  // If user has no recent orders, display a friendly placeholder or hide the section
+  if (items.length === 0) {
+    return null; // Hide the section if empty
+  }
+
+  return (
+    <section className="mt-12">
+      <div className="mb-5 flex items-end justify-between">
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-orange-600">
+            <Repeat size={18} />
+            <span className="text-xs font-bold uppercase tracking-[0.15em]">
+              Quick
+            </span>
+          </div>
+
+          <h3 className="text-3xl font-black">
+            Quick Reorder
+          </h3>
+
+          <p className="mt-1 text-sm text-gray-500">
+            One tap. Same bite as last time.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            onClick={() => handleReorder(item)}
+            className="
+              group
+              flex
+              items-center
+              gap-5
+              rounded-3xl
+              border
+              border-orange-100
+              bg-white
+              p-5
+              lg:p-6
+              transition-all
+              duration-300
+              hover:-translate-y-1
+              hover:shadow-2xl
+              cursor-pointer
+            "
+          >
+            <div className="relative h-28 w-28 lg:h-32 lg:w-32 overflow-hidden rounded-3xl bg-gray-50 flex-shrink-0">
+              <Image
+                src={item.image}
+                alt={item.name}
+                fill
+                className="object-cover transition-all duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-3xl">
+                <Plus size={28} className="text-white" />
+              </div>
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-gray-400 truncate">
+                Last ordered • {item.lastOrdered}
+              </p>
+
+              <h4 className="text-lg font-bold text-gray-900 truncate mt-1">
+                {item.name}
+              </h4>
+
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-lg font-extrabold text-orange-600">
+                  ₹{item.price}
+                </p>
+                <span className="text-xs font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-full group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                  Add +
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }

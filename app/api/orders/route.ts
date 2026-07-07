@@ -160,6 +160,29 @@ export async function POST(req: Request) {
       console.log("Fallback daily order ID:", nextDailyOrderId);
     }
 
+    const orderItemsData = items.map((item: any) => ({
+      foodId: item.foodId,
+      quantity: item.quantity,
+      price: typeof item.price === 'number' ? item.price.toString() : item.price,
+    }));
+
+    // Validate that food IDs exist before creating the order
+    for (const item of orderItemsData) {
+      const foodExists = await db
+        .select()
+        .from(foods)
+        .where(eq(foods.id, item.foodId))
+        .limit(1);
+
+      if (foodExists.length === 0) {
+        console.error("Food not found:", item.foodId);
+        return NextResponse.json(
+          { error: `Food item not found: ${item.foodId}. Please clear your cart and try again.` },
+          { status: 400 }
+        );
+      }
+    }
+
     // Create order
     console.log("Creating order with:", { internalUserId, amount, nextDailyOrderId });
     const [newOrder] = await db
@@ -174,36 +197,22 @@ export async function POST(req: Request) {
 
     console.log("Order created:", newOrder.id);
 
-    // Create order items
-    const orderItemsData = items.map((item: any) => ({
+    const orderItemsWithOrderId = orderItemsData.map((item) => ({
+      ...item,
       orderId: newOrder.id,
-      foodId: item.foodId,
-      quantity: item.quantity,
-      price: typeof item.price === 'number' ? item.price.toString() : item.price,
     }));
 
-    console.log("Creating order items:", orderItemsData);
+    console.log("Creating order items:", orderItemsWithOrderId);
 
-    // Validate that food IDs exist before inserting
-    for (const item of orderItemsData) {
-      const foodExists = await db
-        .select()
-        .from(foods)
-        .where(eq(foods.id, item.foodId))
-        .limit(1);
-      
-      if (foodExists.length === 0) {
-        console.error("Food not found:", item.foodId);
-        return NextResponse.json(
-          { error: `Food item not found: ${item.foodId}. Please clear your cart and try again.` },
-          { status: 400 }
-        );
-      }
+    try {
+      await db.insert(orderItems).values(orderItemsWithOrderId);
+    } catch (itemError) {
+      console.error("Order items insert failed, rolling back order:", itemError);
+      await db.delete(orders).where(eq(orders.id, newOrder.id));
+      throw itemError;
     }
 
-    await db.insert(orderItems).values(orderItemsData);
-
-    console.log("Order items created:", orderItemsData.length);
+    console.log("Order items created:", orderItemsWithOrderId.length);
 
     return NextResponse.json({
       success: true,
@@ -212,7 +221,7 @@ export async function POST(req: Request) {
         userName: userData?.name || '',
         userEmail: userData?.email || '',
       },
-      itemCount: orderItemsData.length,
+      itemCount: orderItemsWithOrderId.length,
     });
   } catch (error) {
     console.error("Error creating order:", error);

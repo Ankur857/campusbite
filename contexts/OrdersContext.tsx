@@ -6,6 +6,9 @@ interface OrderItem {
   foodId: string;
   quantity: number;
   price: string;
+  food?: {
+    name: string;
+  };
 }
 
 interface Order {
