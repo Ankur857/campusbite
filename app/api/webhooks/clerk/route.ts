@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { Webhook } from 'svix';
 import { db } from '@/db';
 import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 const webhookSecret = process.env.CLERK_WEBHOOK_SECRET || '';
 
@@ -44,16 +45,41 @@ export async function POST(req: Request) {
       const name = `${first_name || ''} ${last_name || ''}`.trim() || email?.split('@')[0];
       const phone = phone_numbers[0]?.phone_number || '';
 
-      await db.insert(users).values({
-        clerkId: id,
-        email: email || '',
-        name: name,
-        phone: phone,
-        role: 'USER',
-        bitePoints: 0,
+      // Check if user already exists by clerkId or email
+      let existingUser = await db.query.users.findFirst({
+        where: eq(users.clerkId, id),
       });
 
-      console.log(`User created in database: ${id}`);
+      if (!existingUser && email) {
+        existingUser = await db.query.users.findFirst({
+          where: eq(users.email, email),
+        });
+      }
+
+      if (existingUser) {
+        // Update existing user with clerkId and other details
+        await db.update(users)
+          .set({
+            clerkId: id,
+            email: email || existingUser.email,
+            name: name || existingUser.name,
+            phone: phone || existingUser.phone,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, existingUser.id));
+        console.log(`Linked existing user with email ${email} to clerkId ${id}`);
+      } else {
+        // Insert new user
+        await db.insert(users).values({
+          clerkId: id,
+          email: email || '',
+          name: name,
+          phone: phone,
+          role: 'USER',
+          bitePoints: 0,
+        });
+        console.log(`User created in database: ${id}`);
+      }
     }
 
     return NextResponse.json({ received: true });

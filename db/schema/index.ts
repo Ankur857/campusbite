@@ -5,5 +5,6 @@ export * from "./cart";
 export * from "./cartItems";
 export * from "./orders";
 export * from "./orderItems";
+export * from "./relations";
 // export * from "./reviews";
 // export * from "./favorites";

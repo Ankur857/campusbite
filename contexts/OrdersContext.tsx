@@ -40,9 +40,11 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const refreshOrders = async () => {
+  const refreshOrders = async (showLoader = false) => {
     try {
-      setLoading(true);
+      if (showLoader) {
+        setLoading(true);
+      }
       const res = await fetch("/api/orders");
       if (res.ok) {
         const data = await res.json();
@@ -51,7 +53,9 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.error("Failed to fetch orders", e);
     } finally {
-      setLoading(false);
+      if (showLoader) {
+        setLoading(false);
+      }
     }
   };
 
@@ -75,7 +79,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         }),
       });
       if (res.ok) {
-        await refreshOrders();
+        await refreshOrders(false);
       }
     } catch (e) {
       console.error("Failed to update order", e);
@@ -92,7 +96,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify(orderData),
       });
       if (res.ok) {
-        await refreshOrders();
+        await refreshOrders(false);
       }
     } catch (e) {
       console.error("Failed to add order", e);
@@ -100,10 +104,10 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    refreshOrders();
+    refreshOrders(true);
     
-    // Poll for new orders every 5 seconds for real-time updates
-    const interval = setInterval(refreshOrders, 5000);
+    // Poll for new orders every 5 seconds for real-time updates without showing loader
+    const interval = setInterval(() => refreshOrders(false), 5000);
     return () => clearInterval(interval);
   }, []);
 

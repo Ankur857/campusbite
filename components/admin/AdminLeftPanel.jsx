@@ -55,15 +55,6 @@ const AdminLeftPanel = () => {
           <span className="text-sm font-medium">Live Orders</span>
         </Link>
 
-        <Link href="/admin/menu-management" className={pathname === "/admin/menu-management" ? activeMenuClass : menuClass}>
-          <Image
-            src="/menu.svg"
-            alt="Menu"
-            width={20}
-            height={20}
-          />
-          <span className="text-sm font-medium">Menu</span>
-        </Link>
 
         <Link href="/admin/students" className={pathname === "/admin/students" ? activeMenuClass : menuClass}>
           <Users size={20} />

@@ -19,6 +19,7 @@ export async function GET(req: Request) {
       const { searchParams } = new URL(req.url);
       const userId = searchParams.get("userId");
       const status = searchParams.get("status");
+      const orderId = searchParams.get("orderId");
 
       let query = db
         .select({
@@ -28,6 +29,10 @@ export async function GET(req: Request) {
         .from(orders)
         .leftJoin(users, eq(orders.userId, users.id))
         .orderBy(desc(orders.createdAt));
+
+      if (orderId) {
+        query = query.where(eq(orders.id, orderId));
+      }
 
       if (userId) {
         // If userId is a Clerk ID (not a UUID), look it up

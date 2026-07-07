@@ -24,7 +24,7 @@ export async function syncUser() {
 
   const imageUrl = clerkUser.imageUrl || null;
 
-  // 2. DB me check karo
+  // 2. DB me check by clerkId
   let existingUser: any = null;
   try {
     existingUser = await db.query.users.findFirst({
@@ -33,6 +33,30 @@ export async function syncUser() {
   } catch (e) {
     console.error("Drizzle findFirst error for clerkId:", clerkId, e);
     throw e;
+  }
+
+  // 2b. If not found by clerkId, check by email
+  if (!existingUser && email) {
+    try {
+      existingUser = await db.query.users.findFirst({
+        where: eq(users.email, email),
+      });
+      if (existingUser) {
+        console.log(`Linking existing user with email ${email} to clerkId ${clerkId}`);
+        await db
+          .update(users)
+          .set({ 
+            clerkId, 
+            name: existingUser.name || fullName, 
+            image: existingUser.image || imageUrl,
+            updatedAt: new Date()
+          })
+          .where(eq(users.id, existingUser.id));
+        existingUser.clerkId = clerkId;
+      }
+    } catch (e) {
+      console.error("Drizzle findFirst error for email:", email, e);
+    }
   }
 
   // 3. Agar user already hai → return it
