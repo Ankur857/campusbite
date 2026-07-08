@@ -7,17 +7,26 @@ export default function LiveOrder() {
   const [progress, setProgress] = useState<Record<string, number>>({});
 
   // Convert our new order statuses to LiveOrder statuses
-  const { newOrders, preparingOrders, readyOrders, completedCount } = useMemo(() => {
+  const { newOrders, preparingOrders, readyOrders, completedCountToday, totalOrdersToday, revenueToday } = useMemo(() => {
+    const todayStr = new Date().toDateString();
     const newOrd = orders.filter((o) => o.status === "pending" || o.status === "confirmed");
     const prepOrd = orders.filter((o) => o.status === "preparing");
     const readyOrd = orders.filter((o) => o.status === "ready");
-    const completed = orders.filter((o) => o.status === "delivered" || o.status === "cancelled").length;
+    
+    const todayOrders = orders.filter((o) => new Date(o.createdAt).toDateString() === todayStr);
+    const completedToday = todayOrders.filter((o) => o.status === "delivered" || o.status === "cancelled").length;
+    const totalToday = todayOrders.length;
+    const revToday = todayOrders
+      .filter((o) => o.status !== "cancelled")
+      .reduce((sum, o) => sum + parseFloat(o.totalAmount || "0"), 0);
     
     return {
       newOrders: newOrd,
       preparingOrders: prepOrd,
       readyOrders: readyOrd,
-      completedCount: completed
+      completedCountToday: completedToday,
+      totalOrdersToday: totalToday,
+      revenueToday: revToday
     };
   }, [orders]);
 
@@ -80,11 +89,11 @@ export default function LiveOrder() {
       {/* Analytics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         {[
-          { label: "Total Orders Today", value: orders.length.toString(), color: "bg-orange-50 text-orange-700" },
+          { label: "Total Orders Today", value: totalOrdersToday.toString(), color: "bg-orange-50 text-orange-700" },
           { label: "Orders in Progress", value: preparingOrders.length.toString(), color: "bg-amber-50 text-amber-700" },
           { label: "Ready for Pickup", value: readyOrders.length.toString(), color: "bg-green-50 text-green-700" },
-          { label: "Completed Orders", value: completedCount.toString(), color: "bg-blue-50 text-blue-700" },
-          { label: "Revenue Today", value: "₹" + orders.reduce((sum, o) => sum + parseFloat(o.totalAmount), 0).toFixed(0), color: "bg-emerald-50 text-emerald-700" },
+          { label: "Completed Orders", value: completedCountToday.toString(), color: "bg-blue-50 text-blue-700" },
+          { label: "Revenue Today", value: "₹" + revenueToday.toFixed(0), color: "bg-emerald-50 text-emerald-700" },
         ].map((stat, i) => (
           <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <p className="text-sm text-gray-500 mb-2">{stat.label}</p>

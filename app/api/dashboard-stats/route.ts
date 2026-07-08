@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { orders, foods } from "@/db/schema";
-import { gte } from "drizzle-orm";
+import { gte, ne, and } from "drizzle-orm";
 
 export async function GET() {
   try {
@@ -14,7 +14,12 @@ export async function GET() {
       const todayOrders = await db
         .select()
         .from(orders)
-        .where(gte(orders.createdAt, today));
+        .where(
+          and(
+            gte(orders.createdAt, today),
+            ne(orders.status, "cancelled")
+          )
+        );
       ordersTodayCount = todayOrders.length;
     } catch (dbError) {
       console.error("Failed to query orders count:", dbError);
