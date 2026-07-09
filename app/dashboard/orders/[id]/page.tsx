@@ -104,33 +104,33 @@ export default function OrderTrackingPage() {
     .join(", ") || "Delicious Food Items";
 
   return (
-    <div className="min-h-screen bg-[#FBF6EE] px-4 py-10">
-      <div className="mx-auto max-w-3xl space-y-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 px-4 py-10 text-foreground transition-colors duration-300">
+      <div className="mx-auto max-w-3xl space-y-6 animate-fadeIn">
 
         {/* HEADER CARD */}
-        <div className="rounded-3xl bg-white p-6 shadow-lg border">
-          <p className="text-sm text-gray-500 font-bold uppercase tracking-wider">
+        <div className="rounded-3xl bg-white dark:bg-zinc-900 p-6 shadow-md border border-gray-150/40 dark:border-zinc-800/80">
+          <p className="text-xs text-gray-450 dark:text-zinc-500 font-bold uppercase tracking-wider">
             Order #{order.dailyOrderId || id.slice(0, 8).toUpperCase()}
           </p>
 
-          <h1 className="mt-2 text-2xl font-bold text-gray-900">
+          <h1 className="mt-2 text-2xl font-black text-gray-900 dark:text-white tracking-tight">
             {itemsTitle}
           </h1>
 
-          <p className="text-sm text-gray-500 mt-1">
-            from <span className="font-semibold text-orange-600">Green Chilli Cafe</span>
+          <p className="text-sm text-gray-500 dark:text-zinc-405 mt-1 font-medium">
+            from <span className="font-bold text-orange-655 dark:text-orange-500">Green Chilli Cafe</span>
           </p>
 
           {/* ETA CARD */}
-          <div className="mt-4 flex items-center justify-between rounded-2xl bg-orange-50 p-4 border border-orange-100">
+          <div className="mt-4 flex items-center justify-between rounded-2xl bg-orange-50 dark:bg-orange-950/20 p-4 border border-orange-100 dark:border-orange-900/30">
             <div>
-              <p className="text-xs text-gray-500">Estimated Pickup Time</p>
-              <p className="text-lg font-black text-orange-600">
+              <p className="text-xs text-gray-500 dark:text-zinc-400 font-medium">Estimated Pickup Time</p>
+              <p className="text-lg font-black text-orange-600 dark:text-orange-400">
                 {order.status === "delivered" 
                   ? "Delivered" 
                   : order.status === "cancelled" 
-                    ? "Cancelled" 
-                    : `${eta} min`}
+                  ? "Cancelled" 
+                  : `${eta} min`}
               </p>
             </div>
 
@@ -141,13 +141,13 @@ export default function OrderTrackingPage() {
         </div>
 
         {/* STATUS */}
-        <div className="rounded-3xl bg-white p-6 shadow-lg border">
-          <h2 className="text-lg font-bold mb-4 text-gray-900">
-            Status: <span className="text-orange-600">{statusText}</span>
+        <div className="rounded-3xl bg-white dark:bg-zinc-900 p-6 shadow-md border border-gray-150/40 dark:border-zinc-800/80">
+          <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
+            Status: <span className="text-orange-600 dark:text-orange-450">{statusText}</span>
           </h2>
 
           {/* PROGRESS LINE */}
-          <div className="relative pl-6 border-l-2 border-gray-200 space-y-6 ml-2">
+          <div className="relative pl-6 border-l-2 border-gray-200 dark:border-zinc-800 space-y-6 ml-2">
             {steps.map((s, i) => {
               const active = i <= progressIndex && progressIndex !== -1;
               const current = i === progressIndex;
@@ -159,16 +159,16 @@ export default function OrderTrackingPage() {
                     className={`absolute -left-[31px] z-10 h-4 w-4 rounded-full border-2 transition-all ${
                       active
                         ? current
-                          ? "bg-orange-500 border-orange-500 scale-125 ring-4 ring-orange-100"
+                          ? "bg-orange-500 border-orange-500 scale-125 ring-4 ring-orange-100 dark:ring-orange-900/40"
                           : "bg-orange-500 border-orange-500"
-                        : "bg-white border-gray-300"
+                        : "bg-white dark:bg-zinc-900 border-gray-300 dark:border-zinc-700"
                     }`}
                   />
 
                   <div>
                     <p
                       className={`text-sm font-semibold transition-colors ${
-                        active ? "text-orange-600" : "text-gray-400"
+                        active ? "text-orange-600 dark:text-orange-450" : "text-gray-400 dark:text-zinc-550"
                       }`}
                     >
                       {s.label}
@@ -192,13 +192,13 @@ export default function OrderTrackingPage() {
               {order.tokenNumber && (
                 <div>
                   <p className="text-xs opacity-80">Your Token Number:</p>
-                  <p className="font-black text-2xl text-yellow-200 mt-0.5">#{order.tokenNumber}</p>
+                  <p className="font-black text-2xl text-yellow-250 mt-0.5">#{order.tokenNumber}</p>
                 </div>
               )}
               {order.pickupDetails && (
                 <div>
                   <p className="text-xs opacity-80">Pickup Counter:</p>
-                  <p className="font-black text-lg text-yellow-200 mt-0.5">{order.pickupDetails}</p>
+                  <p className="font-black text-lg text-yellow-250 mt-0.5">{order.pickupDetails}</p>
                 </div>
               )}
             </div>
@@ -207,10 +207,10 @@ export default function OrderTrackingPage() {
 
         {/* ACTIONS */}
         <div className="flex gap-3">
-          <Link href="/dashboard/orders" className="flex-1 text-center py-3.5 rounded-2xl bg-white border border-gray-200 font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+          <Link href="/dashboard/orders" className="flex-1 text-center py-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 font-semibold text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition shadow-sm cursor-pointer">
             Back to Orders List
           </Link>
-          <a href="tel:+91XXXXXXXXXX" className="flex-1 text-center py-3.5 rounded-2xl bg-orange-600 text-white font-semibold hover:bg-orange-700 transition-colors shadow-md">
+          <a href="tel:+91XXXXXXXXXX" className="flex-1 text-center py-3.5 rounded-2xl bg-orange-655 text-white font-semibold hover:bg-orange-700 transition shadow-md">
             Call Support
           </a>
         </div>

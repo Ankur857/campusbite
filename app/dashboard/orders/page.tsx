@@ -69,19 +69,18 @@ function StageTimeline({ stage }: { stage: CookStage }) {
     <div className="mt-4 ">
       <div className="flex gap-2">
         {STAGES.map((s, i) => (
-          <div key={s.key} className="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden">
+          <div key={s.key} className="flex-1 h-2 rounded-full bg-gray-200 dark:bg-zinc-800 overflow-hidden">
             <div
-              className={`h-full transition-all ${
-                i <= idx ? "bg-orange-500" : "bg-gray-200"
-              }`}
+              className={`h-full transition-all ${i <= idx ? "bg-orange-500" : "bg-gray-200 dark:bg-zinc-800"
+                }`}
             />
           </div>
         ))}
       </div>
 
-      <div className="mt-2 flex justify-between text-xs text-gray-500">
+      <div className="mt-2 flex justify-between text-xs text-gray-500 dark:text-zinc-450">
         {STAGES.map((s, i) => (
-          <span key={s.key} className={i <= idx ? "text-orange-500" : ""}>
+          <span key={s.key} className={i <= idx ? "text-orange-500 dark:text-orange-400 font-semibold" : ""}>
             {s.label}
           </span>
         ))}
@@ -109,7 +108,7 @@ function EtaPill({ minutes }: { minutes: number }) {
   const time = useCountdown(minutes);
 
   return (
-    <div className="inline-flex items-center gap-1 rounded-full bg-black px-3 py-1 text-xs text-yellow-200">
+    <div className="inline-flex items-center gap-1 rounded-full bg-black dark:bg-zinc-900 px-3 py-1 text-xs text-yellow-200 border dark:border-zinc-800">
       <Icon.Clock className="h-3 w-3" />
       {time} ETA
     </div>
@@ -196,20 +195,20 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FBF6EE] p-6 flex items-center justify-center">
-        <p className="text-lg text-gray-500">Loading orders...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 p-6 flex items-center justify-center text-gray-500">
+        <p className="text-lg animate-pulse font-semibold">Loading orders...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FBF6EE] p-6 text-xl">
-      <h1 className="text-3xl font-bold">Orders 🍔</h1>
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 p-6 text-xl text-foreground transition-colors duration-300">
+      <h1 className="text-3xl font-black text-gray-950 dark:text-white tracking-tight">Orders 🍔</h1>
 
       {/* search */}
       <div className="mt-4 flex gap-2">
         <input
-          className="w-full rounded-full border px-4 py-2"
+          className="w-full rounded-full border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
           placeholder="Search orders..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -222,11 +221,12 @@ export default function OrdersPage() {
           <button
             key={t}
             onClick={() => setTab(t as any)}
-            className={`rounded-full px-4 py-1 ${
-              tab === t ? "bg-orange-500 text-white" : "bg-white"
-            }`}
+            className={`rounded-full px-4 py-1.5 text-xs font-bold border transition-colors cursor-pointer ${tab === t 
+              ? "bg-orange-500 border-orange-500 text-white" 
+              : "bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800"
+              }`}
           >
-            {t}
+            {t.toUpperCase()}
           </button>
         ))}
       </div>
@@ -234,9 +234,9 @@ export default function OrdersPage() {
       {/* ACTIVE */}
       <div className="mt-6 space-y-4">
         {active.map((o) => (
-          <div key={o.id} className="rounded-xl bg-white p-4">
-            <h2 className="font-bold">{o.title}</h2>
-            <p className="text-sm text-gray-500">{o.restaurant}</p>
+          <div key={o.id} className="rounded-2xl bg-white dark:bg-zinc-900 p-5 border border-gray-150/40 dark:border-zinc-850 shadow-sm">
+            <h2 className="font-extrabold text-gray-950 dark:text-white text-lg">{o.title}</h2>
+            <p className="text-xs text-gray-400 dark:text-zinc-500 font-medium mt-0.5">{o.restaurant}</p>
 
             {o.etaMinutes && <EtaPill minutes={o.etaMinutes} />}
 
@@ -244,7 +244,7 @@ export default function OrdersPage() {
 
             <Link
               href={`/dashboard/orders/${o.id}`}
-              className="mt-3 inline-block text-orange-600"
+              className="mt-3 inline-block text-orange-600 dark:text-orange-400 text-sm font-bold hover:underline"
             >
               Track order →
             </Link>
@@ -254,15 +254,20 @@ export default function OrdersPage() {
 
       {/* PAST */}
       <div className="mt-10 space-y-4">
+        <h3 className="text-sm font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Past Orders</h3>
         {past.map((o) => (
-          <div key={o.id} className="rounded-xl bg-white p-4">
-            <h2 className="font-bold">{o.title}</h2>
-            <p className="text-sm text-gray-500">{o.restaurant}</p>
-            <p>₹{o.total}</p>
+          <div key={o.id} className="rounded-2xl bg-white dark:bg-zinc-900 p-5 border border-gray-150/40 dark:border-zinc-855 shadow-sm space-y-2">
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="font-extrabold text-gray-950 dark:text-white text-lg">{o.title}</h2>
+                <p className="text-xs text-gray-400 dark:text-zinc-500 font-medium mt-0.5">{o.restaurant}</p>
+              </div>
+              <p className="font-black text-gray-900 dark:text-white">₹{o.total}</p>
+            </div>
 
             <Link
               href={`/dashboard/orders/${o.id}`}
-              className="text-gray-500 text-sm"
+              className="text-orange-600 dark:text-orange-400 text-sm font-bold hover:underline inline-block mt-1"
             >
               View details →
             </Link>

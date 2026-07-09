@@ -13,7 +13,7 @@ export default function DashboardLayout({
   return (
     <CartProvider>
       <OrdersProvider>
-        <div className="min-h-screen flex flex-col bg-gray-50">
+        <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-zinc-950 text-foreground transition-colors duration-300">
           {/* Main Content */}
           <main className="flex-1 overflow-y-auto pb-16">
             {children}

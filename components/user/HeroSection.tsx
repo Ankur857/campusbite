@@ -166,183 +166,66 @@ export default function HeroSection() {
 
   const { formatted } = useTimer(remainingSeconds ?? 0);
   const displayName = profileName || clerkUser?.firstName || "Student";
-  
+
   return (
-    <section className="relative overflow-hidden rounded-[32px] border border-orange-100 bg-gradient-to-br from-orange-50 via-orange-100 to-amber-100 shadow-xl">
-        {/* Background Glow */}
-        <div className="absolute -top-20 -right-20 h-72 w-72 rounded-full bg-orange-300/20 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-yellow-300/20 blur-3xl" />
+    <section className="relative overflow-hidden rounded-[32px] border border-orange-100 dark:border-zinc-800 bg-gradient-to-br from-orange-50 via-orange-100 to-amber-100 dark:from-zinc-900/40 dark:via-zinc-950/20 dark:to-zinc-900/40 shadow-xl transition-colors duration-300">
+      {/* Background Glow */}
+      <div className="absolute -top-20 -right-20 h-72 w-72 rounded-full bg-orange-300/20 dark:bg-orange-950/10 blur-3xl" />
+      <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-yellow-300/20 dark:bg-yellow-950/5 blur-3xl" />
 
-        <div className="relative z-10 grid items-center gap-10 p-6 md:grid-cols-2 md:p-10">
-            {/* LEFT CONTENT */}
-            <div className="space-y-6">
-                {/* Break Badge */}
-                <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-orange-600 shadow-sm">
-                    <Clock3 size={14} />
-                    Next Break • 12:30 PM
-
-                    <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
-
-                    {formatted} left
-                </div>
-
-                {/* Heading */}
-                <div>
-                    <h1 className="text-4xl font-black leading-tight md:text-5xl lg:text-6xl">
-                        Hungry,
-                        <span className="text-orange-600">
-                            {" "}{displayName}?
-                        </span>
-                        <br />
-                        Skip the Queue.
-                    </h1>
-
-                    <p className="mt-4 max-w-md text-base text-gray-600 md:text-lg">
-                        Order now and pick up your meal exactly when your
-                        break starts. No waiting, no long queues.
-                    </p>
-                </div>
-
-                {/* CTA */}
-                <div className="flex flex-wrap gap-3">
-                    <button className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                        Order For Break
-                        <ArrowRight size={18} />
-                    </button>
-
-                    <div className="inline-flex items-center gap-2 rounded-full border bg-white px-4 py-3 text-sm text-gray-600 shadow-sm">
-                        <MapPin
-                            size={16}
-                            className="text-orange-600"
-                        />
-                        Main Block • 2 min walk
-                    </div>
-                </div>
-
-                {/* Small Stats */}
-                <div className="flex flex-wrap gap-3">
-                    <div className="rounded-2xl bg-white px-4 py-3 shadow-md">
-                        <p className="text-xs text-gray-500">
-                            Orders Today
-                        </p>
-                        <p className="font-bold text-orange-600">
-                            {stats.ordersToday}
-                        </p>
-                    </div>
-
-                    <div className="rounded-2xl bg-white px-4 py-3 shadow-md">
-                        <p className="text-xs text-gray-500">
-                            Avg Pickup
-                        </p>
-                        <p className="font-bold text-green-600">
-                            {stats.avgPrepTime} min
-                        </p>
-                    </div>
-
-                    <div className="rounded-2xl bg-white px-4 py-3 shadow-md">
-                        <p className="text-xs text-gray-500">
-                            Rating
-                        </p>
-                        <p className="font-bold text-orange-600">
-                            {stats.rating}/5
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* RIGHT IMAGE */}
-            <div className="relative flex justify-center">
-                {/* Glow */}
-                <div className="absolute h-72 w-72 rounded-full bg-orange-300/30 blur-3xl" />
-
-                <motion.div
-                    initial={{
-                        opacity: 0,
-                        x: 50,
-                        scale: 0.9,
-                    }}
-                    animate={{
-                        opacity: 1,
-                        x: 0,
-                        scale: 1,
-                        y: [0, -12, 0],
-                    }}
-                    transition={{
-                        duration: 1,
-                        y: {
-                            duration: 4,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                        },
-                    }}
-                    className="relative"
-                >
-                    <Image
-                        src="/pizza-new.jpg"
-                        alt="Pizza"
-                        width={700}
-                        height={700}
-                        priority
-                        className=" h-auto w-[320px] md:w-[450px] lg:w-[550px] xl:w-[620px] rounded-[32px] object-cover shadow-2xl"
-                    />
-
-                    {/* Floating Order Card */}
-                    <motion.div
-                        animate={{
-                            y: [0, -8, 0],
-                        }}
-                        transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                        }}
-                        className="
-            absolute
-            left-0
-            top-10
-            rounded-full
-            bg-white
-            px-4
-            py-2
-            font-semibold
-            text-orange-600
-            shadow-lg
-          "
-                    >
-                        🔥 {stats.ordersToday} orders today
-                    </motion.div>
-
-                    {/* Floating Pickup Card */}
-                    <motion.div
-                        animate={{
-                            y: [0, 8, 0],
-                        }}
-                        transition={{
-                            duration: 2.5,
-                            repeat: Infinity,
-                        }}
-                        className="
-            absolute
-            -bottom-2
-            right-0
-            rounded-2xl
-            bg-white
-            px-4
-            py-3
-            shadow-xl
-          "
-                    >
-                        <p className="text-xs text-gray-500">
-                            Avg Pickup Time
-                        </p>
-
-                        <p className="flex items-center gap-1 text-lg font-bold text-orange-600">
-                            <Flame size={16} />
-                            {stats.avgPrepTime} min
-                        </p>
-                    </motion.div>
-                </motion.div>
-            </div>
+      <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto p-8 md:p-12 space-y-6">
+        {/* Break Badge */}
+        <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2 text-xs font-bold text-orange-600 dark:text-orange-400 shadow-sm">
+          <Clock3 size={14} />
+          <span>Next Break • 12:30 PM</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+          <span>{formatted} left</span>
         </div>
+
+        {/* Heading */}
+        <div className="space-y-4">
+          <h1 className="text-4xl md:text-5xl font-black leading-tight tracking-tight text-gray-950 dark:text-white">
+            Hungry, <span className="text-orange-600 dark:text-orange-400">{displayName}?</span>
+            <br />
+            Skip the Queue.
+          </h1>
+
+          <p className="text-base md:text-lg text-gray-600 dark:text-zinc-400 max-w-md mx-auto font-medium">
+            Order now and pick up your meal exactly when your break starts. No waiting, no long queues.
+          </p>
+        </div>
+
+        {/* CTA */}
+        <div className="flex flex-wrap justify-center gap-3 w-full">
+          <button className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 font-bold text-white shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer">
+            <span>Order For Break</span>
+            <ArrowRight size={18} />
+          </button>
+
+          <div className="inline-flex items-center gap-2 rounded-full border border-gray-150/40 dark:border-zinc-850 bg-white dark:bg-zinc-900 px-4 py-3 text-sm font-semibold text-gray-600 dark:text-zinc-300 shadow-sm">
+            <MapPin size={16} className="text-orange-600" />
+            <span>Main Block • 2 min walk</span>
+          </div>
+        </div>
+
+        {/* Small Stats */}
+        <div className="flex flex-wrap justify-center gap-4 pt-4 w-full">
+          <div className="rounded-2xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 py-3 shadow-sm min-w-[120px]">
+            <p className="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Orders Today</p>
+            <p className="text-lg font-black text-orange-600 dark:text-orange-400 mt-0.5">{stats.ordersToday}</p>
+          </div>
+
+          <div className="rounded-2xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 py-3 shadow-sm min-w-[120px]">
+            <p className="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Avg Pickup</p>
+            <p className="text-lg font-black text-green-600 dark:text-green-400 mt-0.5">{stats.avgPrepTime} min</p>
+          </div>
+
+          <div className="rounded-2xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 py-3 shadow-sm min-w-[120px]">
+            <p className="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Cafe Rating</p>
+            <p className="text-lg font-black text-orange-600 dark:text-orange-400 mt-0.5">{stats.rating}/5</p>
+          </div>
+        </div>
+      </div>
     </section>
   );
-}
+}

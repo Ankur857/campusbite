@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { FilterState, MenuItem } from "@/types/menu";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { RestaurantHeader } from "@/components/menu/RestaurantHeader";
-import { CategoryTabs } from "@/components/menu/CategoryTabs";
+
 import { MenuItemCard } from "@/components/menu/MenuItemCard";
 import { SearchBar } from "@/components/menu/SearchBar";
 import { FilterBar } from "@/components/menu/FilterBar";
 import { PopularCarousel } from "@/components/menu/PopularCarousel";
-import { MenuAccordion } from "@/components/menu/MenuAccordion";
 import { FloatingCart } from "@/components/menu/FloatingCart";
+import { categoryIcons } from "@/data/menu";
 
 export default function MenuPage() {
   const [activeCategory, setActiveCategory] = useState("Popular");
@@ -21,12 +21,10 @@ export default function MenuPage() {
     popularOnly: false,
     sortBy: "default",
   });
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["Popular"]));
   const [menuData, setMenuData] = useState<any[]>([]);
   const [loadingFoods, setLoadingFoods] = useState(true);
 
-  const { cart, loading: cartLoading, addToCart, removeFromCart, updateQuantity } = useCart();
-  const categoryRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const { cart, addToCart, removeFromCart, updateQuantity } = useCart();
 
   // Fetch foods dynamically from the database API
   useEffect(() => {
@@ -181,54 +179,27 @@ export default function MenuPage() {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   };
 
-  const scrollToCategory = (category: string) => {
-    setActiveCategory(category);
-    
-    // Expand the clicked category
-    setExpandedCategories(prev => new Set([...prev, category]));
-    
-    // Scroll to the category
-    const element = categoryRefs.current.get(category);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
+  // Check if any search queries or filters are active
+  const isSearching = !!filters.searchQuery || filters.vegOnly || filters.popularOnly || filters.sortBy !== "default";
 
-  // Auto-expand category on search
-  useEffect(() => {
-    if (filters.searchQuery) {
-      // Find first category with matching items
-      const matchingCategory = sortedMenuData.find((cat: any) => cat.items.length > 0);
-      if (matchingCategory) {
-        setExpandedCategories(prev => new Set([matchingCategory.category]));
-        setActiveCategory(matchingCategory.category);
-      }
-    }
-  }, [filters.searchQuery, sortedMenuData]);
-
-  // Handle "Popular" category
-  const popularCategory = {
-    category: "Popular",
-    items: allItems.filter((item: any) => item.popular).slice(0, 8)
-  };
-
-  const displayMenuData = activeCategory === "Popular" 
-    ? [popularCategory, ...sortedMenuData.filter((cat: any) => cat.category !== "Popular")]
-    : sortedMenuData;
+  // Filter out popular/top items
+  const popularItems = useMemo(() => {
+    return allItems.filter((item: any) => item.popular);
+  }, [allItems]);
 
   if (loadingFoods) {
     return (
-      <div className="min-h-screen bg-[#fcfaf5] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
-          <p className="text-lg text-gray-500 font-semibold mb-2 animate-pulse">Loading Green Chilli Cafe Menu...</p>
-          <p className="text-sm text-gray-400">Connecting to canteen database...</p>
+          <p className="text-lg text-gray-500 dark:text-zinc-400 font-semibold mb-2 animate-pulse">Loading Green Chilli Cafe Menu...</p>
+          <p className="text-sm text-gray-400 dark:text-zinc-500">Connecting to canteen database...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 pb-20 text-foreground transition-colors duration-300">
       <RestaurantHeader
         name="Green Chilli Cafe"
         rating={4.5}
@@ -253,75 +224,150 @@ export default function MenuPage() {
           <FilterBar filters={filters} onFilterChange={handleFilterChange} />
         </div>
 
-        {/* Category Tabs */}
-        <CategoryTabs
-          categories={sortedMenuData.map((cat: any) => cat.category)}
-          activeCategory={activeCategory}
-          onCategoryChange={scrollToCategory}
-        />
 
-        {/* Popular Carousel */}
-        {!filters.searchQuery && !filters.vegOnly && !filters.popularOnly && activeCategory === "Popular" && (
+
+        {/* Popular Carousel (Only on Popular/Home view when not searching) */}
+        {!isSearching && activeCategory === "Popular" && (
           <PopularCarousel
             items={allItems}
             onAddToCart={handleAddToCart}
           />
         )}
 
-        {/* Menu Categories */}
-        <div className="space-y-8">
-          {displayMenuData.map((category: any) => {
-            if (category.items.length === 0) return null;
+        {/* MAIN DYNAMIC CONTENT */}
+        {isSearching ? (
+          // Grouped Search Results View
+          <div className="space-y-8 animate-fadeIn">
+            <h2 className="text-lg font-bold text-gray-500 dark:text-zinc-450 mb-2">Search Results</h2>
+            {sortedMenuData.map((category: any) => {
+              if (category.items.length === 0) return null;
+              const icon = categoryIcons[category.category] || '🍽️';
+              return (
+                <div key={category.category} className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-zinc-800">
+                    <span className="text-xl">{icon}</span>
+                    <h3 className="font-bold text-gray-800 dark:text-white">{category.category}</h3>
+                    <span className="text-xs text-gray-400 dark:text-zinc-500">({category.items.length})</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {category.items.map((item: any) => (
+                      <MenuItemCard
+                        key={item.id}
+                        item={{ ...item, category: category.category }}
+                        quantity={getItemQuantity(item.id)}
+                        onAdd={() => handleAddToCart({ ...item, category: category.category }, category.category)}
+                        onIncrease={() => handleIncreaseQuantity(item.id)}
+                        onDecrease={() => handleDecreaseQuantity(item.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {sortedMenuData.every((cat: any) => cat.items.length === 0) && (
+              <div className="flex flex-col items-center justify-center py-16">
+                <p className="text-xl text-gray-500 dark:text-zinc-400 mb-2">No items found</p>
+                <p className="text-sm text-gray-400 dark:text-zinc-500">Try adjusting your search or filters</p>
+              </div>
+            )}
+          </div>
+        ) : activeCategory === "Popular" ? (
+          // Default landing dashboard view
+          <div className="space-y-8 animate-fadeIn">
+            {/* Top Regular Items (Favorites) */}
+            {popularItems.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <span>🔥 Customer Favorites</span>
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {popularItems.slice(0, 6).map((item: any) => (
+                    <MenuItemCard
+                      key={item.id}
+                      item={item}
+                      quantity={getItemQuantity(item.id)}
+                      onAdd={() => handleAddToCart(item, item.category)}
+                      onIncrease={() => handleIncreaseQuantity(item.id)}
+                      onDecrease={() => handleDecreaseQuantity(item.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
-            const isExpanded = expandedCategories.has(category.category);
-
+            {/* Browse Categories Grid */}
+            <div className="space-y-4 pt-4">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <span>Explore Categories</span>
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {sortedMenuData.map((cat: any) => {
+                  const icon = categoryIcons[cat.category] || '🍽️';
+                  return (
+                    <button
+                      key={cat.category}
+                      onClick={() => setActiveCategory(cat.category)}
+                      className="flex flex-col items-center justify-center p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800/80 shadow-sm hover:shadow-md hover:scale-105 hover:bg-gray-50 dark:hover:bg-zinc-850/80 transition-all duration-300 group cursor-pointer"
+                    >
+                      <span className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">{icon}</span>
+                      <span className="font-semibold text-gray-800 dark:text-zinc-200 text-sm text-center">{cat.category}</span>
+                      <span className="text-xs text-gray-400 dark:text-zinc-500 mt-1">{cat.items.length} items</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Selected Category View
+          (() => {
+            const categoryData = sortedMenuData.find((cat: any) => cat.category === activeCategory);
+            if (!categoryData || categoryData.items.length === 0) {
+              return (
+                <div className="flex flex-col items-center justify-center py-16 animate-fadeIn">
+                  <p className="text-xl text-gray-500 dark:text-zinc-400 mb-2">No items in this category</p>
+                  <button
+                    onClick={() => setActiveCategory("Popular")}
+                    className="mt-4 px-4 py-2 bg-orange-600 text-white rounded-xl font-medium cursor-pointer"
+                  >
+                    Back to categories
+                  </button>
+                </div>
+              );
+            }
             return (
-              <div
-                key={category.category}
-                ref={(el) => {
-                  if (el) categoryRefs.current.set(category.category, el);
-                }}
-                id={`category-${category.category}`}
-              >
-                <MenuAccordion
-                  category={category.category}
-                  items={category.items}
-                  isExpanded={isExpanded}
-                  onToggle={() => {
-                    setExpandedCategories(prev => {
-                      const newSet = new Set(prev);
-                      if (newSet.has(category.category)) {
-                        newSet.delete(category.category);
-                      } else {
-                        newSet.add(category.category);
-                        // Collapse other categories
-                        sortedMenuData.forEach((cat: any) => {
-                          if (cat.category !== category.category) {
-                            newSet.delete(cat.category);
-                          }
-                        });
-                      }
-                      return newSet;
-                    });
-                  }}
-                  onAddToCart={handleAddToCart}
-                  onIncreaseQuantity={handleIncreaseQuantity}
-                  onDecreaseQuantity={handleDecreaseQuantity}
-                  getItemQuantity={getItemQuantity}
-                />
+              <div className="space-y-6 animate-fadeIn">
+                <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-zinc-800">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">{categoryIcons[activeCategory] || '🍽️'}</span>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{activeCategory}</h2>
+                      <p className="text-xs text-gray-400 dark:text-zinc-500">{categoryData.items.length} dishes available</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setActiveCategory("Popular")}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-medium rounded-full transition-all cursor-pointer"
+                  >
+                    ← Back to Categories
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {categoryData.items.map((item: any) => (
+                    <MenuItemCard
+                      key={item.id}
+                      item={{ ...item, category: categoryData.category }}
+                      quantity={getItemQuantity(item.id)}
+                      onAdd={() => handleAddToCart({ ...item, category: categoryData.category }, categoryData.category)}
+                      onIncrease={() => handleIncreaseQuantity(item.id)}
+                      onDecrease={() => handleDecreaseQuantity(item.id)}
+                    />
+                  ))}
+                </div>
               </div>
             );
-          })}
-        </div>
-
-        {/* Empty State */}
-        {sortedMenuData.every((cat: any) => cat.items.length === 0) && (
-          <div className="flex flex-col items-center justify-center py-16">
-            <p className="text-xl text-gray-500 mb-2">No items found</p>
-            <p className="text-sm text-gray-400">
-              Try adjusting your search or filters
-            </p>
-          </div>
+          })()
         )}
       </div>
 

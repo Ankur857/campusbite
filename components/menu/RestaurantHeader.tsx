@@ -9,7 +9,6 @@ interface RestaurantHeaderProps {
   deliveryTime?: string;
   location?: string;
   cuisine?: string;
-  image?: string;
   isOpen?: boolean;
 }
 
@@ -19,75 +18,54 @@ export function RestaurantHeader({
   deliveryTime,
   location,
   cuisine,
-  image,
   isOpen = true
 }: RestaurantHeaderProps) {
   return (
-    <div className="bg-white">
-      {/* Restaurant Banner */}
-      <div className="relative h-48 md:h-64 bg-gradient-to-br from-orange-400 to-orange-600 overflow-hidden">
-        {image ? (
-          <img
-            src={image}
-            alt={name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-6xl">🍽️</span>
-          </div>
-        )}
-        <div className="absolute inset-0 bg-black/20" />
-      </div>
-
-      {/* Restaurant Info */}
-      <div className="max-w-4xl mx-auto px-4 py-6 -mt-8 relative z-10">
+    <div className="bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 dark:from-zinc-900/40 dark:via-zinc-950/20 dark:to-zinc-900/40 border-b border-orange-100/50 dark:border-zinc-800 py-8 transition-colors duration-300">
+      <div className="max-w-4xl mx-auto px-4">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-white rounded-xl shadow-lg p-6"
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4"
         >
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{name}</h1>
-              
-              <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
-                {rating && (
-                  <div className="flex items-center gap-1 bg-green-600 text-white px-2 py-1 rounded">
-                    <Star size={14} fill="white" />
-                    <span className="font-semibold">{rating.toFixed(1)}</span>
-                  </div>
-                )}
-                
-                {deliveryTime && (
-                  <div className="flex items-center gap-1">
-                    <Clock size={16} />
-                    <span>{deliveryTime}</span>
-                  </div>
-                )}
-                
-                {cuisine && (
-                  <span className="text-gray-700">{cuisine}</span>
-                )}
-              </div>
+          {/* Left Info */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🍛</span>
+              <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{name}</h1>
+              <span className={`inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold ${
+                isOpen 
+                  ? 'bg-green-100 dark:bg-green-950/20 text-green-700 dark:text-green-455 border border-green-200 dark:border-green-800/30' 
+                  : 'bg-red-100 dark:bg-red-950/20 text-red-700 dark:text-red-455 border border-red-200 dark:border-red-800/30'
+              }`}>
+                {isOpen ? 'Open Now' : 'Closed'}
+              </span>
+            </div>
+            
+            <p className="text-sm text-gray-600 dark:text-zinc-400 font-medium">{cuisine}</p>
 
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+              {rating && (
+                <div className="flex items-center gap-1 bg-amber-500 text-white px-2 py-0.5 rounded-lg font-bold shadow-sm">
+                  <Star size={13} fill="white" className="stroke-none" />
+                  <span>{rating.toFixed(1)}</span>
+                </div>
+              )}
+              
+              {deliveryTime && (
+                <div className="flex items-center gap-1 text-gray-600 dark:text-zinc-300 font-semibold bg-white dark:bg-zinc-900 border border-orange-100/80 dark:border-zinc-800/60 px-2.5 py-0.5 rounded-lg shadow-sm">
+                  <Clock size={14} className="text-orange-500" />
+                  <span>{deliveryTime}</span>
+                </div>
+              )}
+              
               {location && (
-                <div className="flex items-center gap-1 mt-2 text-sm text-gray-500">
-                  <MapPin size={16} />
+                <div className="flex items-center gap-1 text-gray-500 dark:text-zinc-450 font-medium">
+                  <MapPin size={14} className="text-red-500" />
                   <span>{location}</span>
                 </div>
               )}
-            </div>
-
-            <div className="ml-4">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                isOpen 
-                  ? 'bg-green-100 text-green-700' 
-                  : 'bg-red-100 text-red-700'
-              }`}>
-                {isOpen ? 'Open' : 'Closed'}
-              </span>
             </div>
           </div>
         </motion.div>

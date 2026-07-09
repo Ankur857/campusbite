@@ -10,7 +10,7 @@ interface CategoryTabsProps {
 }
 
 export function CategoryTabs({ categories, activeCategory, onCategoryChange }: CategoryTabsProps) {
-  const mainCategories = ['Popular', 'Burger', 'Chinese', 'Sandwiches', 'Pizza', 'Momos', 'South Indian', 'Shakes'];
+  const allCategories = Array.from(new Set(['Popular', ...categories]));
   
   return (
     <motion.div
@@ -21,8 +21,10 @@ export function CategoryTabs({ categories, activeCategory, onCategoryChange }: C
     >
       <div className="max-w-4xl mx-auto px-4 py-3">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {mainCategories.map((category) => {
-            const icon = category === 'Popular' ? '🔥' : categoryIcons[category] || '🍽️';
+          {allCategories.map((category) => {
+            const icon = category === 'Popular' 
+              ? '🔥' 
+              : categoryIcons[category] || categoryIcons[category + 's'] || categoryIcons[category.replace(/s$/, '')] || '🍽️';
             return (
               <button
                 key={category}

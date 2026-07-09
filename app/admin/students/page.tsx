@@ -68,8 +68,6 @@ export default function StudentsPage() {
   // Compute directory metrics
   const totalStudents = students.length;
   const totalOrders = students.reduce((sum, s) => sum + s.totalOrders, 0);
-  const totalSpendVal = students.reduce((sum, s) => sum + s.totalSpent, 0);
-  const avgSpent = totalStudents > 0 ? (totalSpendVal / totalStudents).toFixed(0) : "0";
   
   const topSpender = [...students].sort((a, b) => b.totalSpent - a.totalSpent)[0];
 
@@ -86,27 +84,27 @@ export default function StudentsPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-gray-50">
+    <div className="flex min-h-screen w-full bg-gray-50 dark:bg-zinc-950 text-foreground transition-colors duration-300">
       <AdminLeftPanel />
 
       <div className="flex-1 p-8 overflow-auto">
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-black text-gray-900">Student Directory</h1>
+            <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Student Directory</h1>
             <p className="text-gray-500 text-sm mt-1">
               Analyze purchasing habits and student order histories
             </p>
           </div>
 
-          <div className="flex items-center gap-3 border border-gray-200 rounded-full px-5 py-2.5 w-full md:w-80 bg-white shadow-sm focus-within:ring-2 focus-within:ring-orange-500 transition-all">
+          <div className="flex items-center gap-3 border border-gray-200 dark:border-zinc-800 rounded-full px-5 py-2.5 w-full md:w-80 bg-white dark:bg-zinc-900 shadow-sm focus-within:ring-2 focus-within:ring-orange-500 transition-all">
             <Search size={18} className="text-gray-400" />
             <input
               type="search"
               placeholder="Search students..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="outline-none w-full text-sm text-gray-700 bg-transparent"
+              className="outline-none w-full text-sm text-gray-700 dark:text-zinc-300 bg-transparent"
             />
           </div>
         </div>
@@ -118,44 +116,34 @@ export default function StudentsPage() {
         ) : (
           <>
             {/* STATS CARDS */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition">
-                <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-5 hover:shadow-md transition">
+                <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-950/20 text-orange-600 dark:text-orange-400 flex items-center justify-center font-bold text-xl border border-orange-100/30">
                   👥
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Total Students</p>
-                  <h3 className="text-2xl font-black text-gray-800 mt-1">{totalStudents}</h3>
+                  <p className="text-xs text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider">Total Students</p>
+                  <h3 className="text-2xl font-black text-gray-800 dark:text-zinc-100 mt-1">{totalStudents}</h3>
                 </div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition">
-                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xl">
+              <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-5 hover:shadow-md transition">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-xl border border-amber-100/30">
                   📦
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Total Orders</p>
-                  <h3 className="text-2xl font-black text-gray-800 mt-1">{totalOrders}</h3>
+                  <p className="text-xs text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider">Total Orders</p>
+                  <h3 className="text-2xl font-black text-gray-800 dark:text-zinc-100 mt-1">{totalOrders}</h3>
                 </div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl">
-                  💳
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Avg Spent</p>
-                  <h3 className="text-2xl font-black text-gray-800 mt-1">₹{avgSpent}</h3>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-md transition">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl">
+              <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-5 hover:shadow-md transition">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xl border border-blue-100/30">
                   👑
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Top Spender</p>
-                  <h3 className="text-base font-bold text-gray-800 truncate mt-1">
+                  <p className="text-xs text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider">Top Spender</p>
+                  <h3 className="text-base font-bold text-gray-800 dark:text-zinc-100 truncate mt-1">
                     {topSpender ? `${topSpender.name} (₹${topSpender.totalSpent})` : "N/A"}
                   </h3>
                 </div>
@@ -163,21 +151,21 @@ export default function StudentsPage() {
             </div>
 
             {/* DIRECTORY TABLE */}
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-100">
+                  <thead className="bg-gray-50 dark:bg-zinc-950/50 border-b border-gray-100 dark:border-zinc-800">
                     <tr>
-                      <th className="text-left p-5 text-xs font-bold text-gray-500 uppercase tracking-wider">Student</th>
-                      <th className="text-left p-5 text-xs font-bold text-gray-500 uppercase tracking-wider">Phone</th>
-                      <th className="text-left p-5 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Orders</th>
-                      <th className="text-left p-5 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Items</th>
-                      <th className="text-left p-5 text-xs font-bold text-gray-500 uppercase tracking-wider">Favorite Item</th>
-                      <th className="text-left p-5 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Spent</th>
-                      <th className="text-center p-5 text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
+                      <th className="text-left p-5 text-xs font-bold text-gray-550 dark:text-zinc-400 uppercase tracking-wider">Student</th>
+                      <th className="text-left p-5 text-xs font-bold text-gray-550 dark:text-zinc-400 uppercase tracking-wider">Phone</th>
+                      <th className="text-left p-5 text-xs font-bold text-gray-550 dark:text-zinc-400 uppercase tracking-wider text-center">Orders</th>
+                      <th className="text-left p-5 text-xs font-bold text-gray-555 dark:text-zinc-400 uppercase tracking-wider text-center">Items</th>
+                      <th className="text-left p-5 text-xs font-bold text-gray-550 dark:text-zinc-400 uppercase tracking-wider">Favorite Item</th>
+                      <th className="text-left p-5 text-xs font-bold text-gray-555 dark:text-zinc-400 uppercase tracking-wider text-right">Spent</th>
+                      <th className="text-center p-5 text-xs font-bold text-gray-555 dark:text-zinc-400 uppercase tracking-wider">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
                     {filteredStudents.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="text-center py-10 text-gray-500">
@@ -186,37 +174,39 @@ export default function StudentsPage() {
                       </tr>
                     ) : (
                       filteredStudents.map(student => (
-                        <tr key={student.id} className="hover:bg-orange-50/20 transition duration-200">
+                        <tr key={student.id} className="hover:bg-orange-50/20 dark:hover:bg-orange-950/5 transition duration-200">
                           <td className="p-5">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 font-bold text-white flex items-center justify-center text-sm shadow">
                                 {student.name[0]?.toUpperCase()}
                               </div>
                               <div>
-                                <h4 className="font-semibold text-gray-900 text-sm">{student.name}</h4>
-                                <p className="text-xs text-gray-400 mt-0.5">{student.email}</p>
+                                <p className="font-bold text-gray-800 dark:text-zinc-200 leading-tight">{student.name}</p>
+                                <p className="text-xs text-gray-400 dark:text-zinc-500 truncate max-w-[160px]">{student.email}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="p-5 text-sm text-gray-600">{student.phone || "—"}</td>
-                          <td className="p-5 text-sm text-center text-gray-700 font-semibold">{student.totalOrders}</td>
-                          <td className="p-5 text-sm text-center text-gray-700">{student.totalItems}</td>
-                          <td className="p-5 text-sm text-gray-700">
-                            {student.mostOrderedItem !== "None" ? (
-                              <span className="inline-flex rounded-full bg-orange-50 text-orange-700 px-3 py-1 text-xs font-medium border border-orange-100">
-                                🍕 {student.mostOrderedItem}
-                              </span>
-                            ) : (
-                              <span className="text-gray-400">—</span>
-                            )}
+                          <td className="p-5 text-sm text-gray-700 dark:text-zinc-300">
+                            {student.phone || "—"}
                           </td>
-                          <td className="p-5 text-sm text-right font-bold text-orange-700">₹{student.totalSpent}</td>
+                          <td className="p-5 text-sm text-gray-800 dark:text-zinc-200 text-center font-bold">
+                            {student.totalOrders}
+                          </td>
+                          <td className="p-5 text-sm text-gray-800 dark:text-zinc-200 text-center">
+                            {student.totalItems}
+                          </td>
+                          <td className="p-5 text-sm text-gray-700 dark:text-zinc-300 max-w-[150px] truncate" title={student.mostOrderedItem}>
+                            {student.mostOrderedItem}
+                          </td>
+                          <td className="p-5 text-sm font-extrabold text-gray-900 dark:text-white text-right">
+                            ₹{student.totalSpent}
+                          </td>
                           <td className="p-5 text-center">
                             <button
                               onClick={() => setSelectedStudent(student)}
-                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-orange-600 text-white text-xs font-semibold hover:bg-orange-700 transition"
+                              className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 border border-orange-100/30 dark:border-orange-900/30 hover:bg-orange-100 dark:hover:bg-orange-900/40 transition cursor-pointer"
                             >
-                              <Eye size={14} /> History
+                              Details
                             </button>
                           </td>
                         </tr>
@@ -233,13 +223,13 @@ export default function StudentsPage() {
       {/* DETAIL MODAL */}
       {selectedStudent && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white w-full max-w-4xl max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col border animate-slide-up">
+          <div className="bg-white dark:bg-zinc-900 w-full max-w-4xl max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-gray-100 dark:border-zinc-805/80 animate-slide-up">
             
             {/* Modal Header */}
             <div className="bg-gradient-to-r from-orange-500 to-red-500 p-6 text-white relative">
               <button
                 onClick={() => setSelectedStudent(null)}
-                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition"
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition cursor-pointer"
               >
                 <X size={20} />
               </button>
@@ -282,7 +272,7 @@ export default function StudentsPage() {
 
             {/* Modal Body (Order History Table) */}
             <div className="flex-1 overflow-y-auto p-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-zinc-200 mb-4 flex items-center gap-2">
                 <BookOpen size={18} className="text-orange-600" /> Order History
               </h3>
               
@@ -291,9 +281,9 @@ export default function StudentsPage() {
                   This student hasn't placed any orders yet.
                 </div>
               ) : (
-                <div className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                <div className="border border-gray-100 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-gray-600 font-bold border-b border-gray-100">
+                    <thead className="bg-gray-50 dark:bg-zinc-950/40 text-gray-650 dark:text-zinc-400 font-bold border-b border-gray-100 dark:border-zinc-800">
                       <tr>
                         <th className="p-4 text-left">Order ID</th>
                         <th className="p-4 text-left">Date & Time</th>
@@ -302,13 +292,13 @@ export default function StudentsPage() {
                         <th className="p-4 text-right">Total Price</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
                       {selectedStudent.orderHistory.map((order) => (
-                        <tr key={order.id} className="hover:bg-slate-50 transition duration-150">
-                          <td className="p-4 font-semibold text-gray-800">
+                        <tr key={order.id} className="hover:bg-slate-50 dark:hover:bg-zinc-850/30 transition duration-150">
+                          <td className="p-4 font-semibold text-gray-800 dark:text-white">
                             #{order.dailyOrderId || order.id.slice(0, 8).toUpperCase()}
                           </td>
-                          <td className="p-4 text-gray-500">
+                          <td className="p-4 text-gray-500 dark:text-zinc-450">
                             {new Date(order.createdAt).toLocaleString(undefined, {
                               month: 'short',
                               day: 'numeric',
@@ -316,7 +306,7 @@ export default function StudentsPage() {
                               minute: '2-digit'
                             })}
                           </td>
-                          <td className="p-4 text-gray-700 max-w-xs">
+                          <td className="p-4 text-gray-700 dark:text-zinc-300 max-w-xs">
                             {order.items.map((item, idx) => (
                               <div key={idx} className="truncate">
                                 • {item.name} <span className="text-gray-400 text-xs font-semibold">x{item.quantity}</span>
@@ -328,7 +318,7 @@ export default function StudentsPage() {
                               {order.status}
                             </span>
                           </td>
-                          <td className="p-4 text-right font-bold text-gray-900">
+                          <td className="p-4 text-right font-bold text-gray-900 dark:text-white">
                             ₹{parseFloat(order.totalAmount).toFixed(0)}
                           </td>
                         </tr>
@@ -340,10 +330,10 @@ export default function StudentsPage() {
             </div>
             
             {/* Modal Footer */}
-            <div className="bg-gray-50 border-t px-6 py-4 flex justify-end">
+            <div className="bg-gray-50 dark:bg-zinc-950/40 border-t border-gray-100 dark:border-zinc-850/60 px-6 py-4 flex justify-end">
               <button
                 onClick={() => setSelectedStudent(null)}
-                className="px-5 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
+                className="px-5 py-2 rounded-xl bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-semibold hover:bg-gray-300 dark:hover:bg-zinc-700 transition cursor-pointer"
               >
                 Close
               </button>

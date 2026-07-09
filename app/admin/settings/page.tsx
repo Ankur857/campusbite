@@ -9,7 +9,7 @@ import PaymentGateway from "../../../components/admin/settings/PaymentGateway";
 
 export default function SettingsPage() {
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-zinc-950 text-foreground transition-colors duration-300">
       {/* Main Admin Sidebar */}
       <AdminLeftPanel />
 

@@ -46,10 +46,7 @@ export default function CartPage() {
   const displayName = profileName || user?.firstName || "Student";
 
   const subtotal = getCartTotal();
-  const packing = 10;
-  const gst = Math.round(subtotal * 0.05);
-  const discount = 0;
-  const total = subtotal + packing + gst - discount;
+  const total = subtotal;
 
   const handlePlaceOrder = async () => {
     if (!userId) {
@@ -176,8 +173,8 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#fcfaf5] flex items-center justify-center">
-        <p className="text-lg text-gray-500">Loading cart...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex items-center justify-center transition-colors duration-300">
+        <p className="text-lg text-gray-500 dark:text-zinc-400 font-semibold animate-pulse">Loading cart...</p>
       </div>
     );
   }
@@ -185,24 +182,24 @@ export default function CartPage() {
   const initial = user?.firstName?.[0]?.toUpperCase() || user?.emailAddresses?.[0]?.emailAddress?.[0]?.toUpperCase() || "S";
 
   return (
-    <div className="min-h-screen bg-[#fcfaf5]">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 text-foreground transition-colors duration-300">
       {/* HEADER */}
-      <header className="sticky top-0 z-40 border-b bg-[#fcfaf5]/85 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-orange-100 dark:border-zinc-800 bg-[#FFF8F3]/80 dark:bg-zinc-950/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <img
               src="/green-chilli-logo.png"
               alt="Green Chilli Cafe Logo"
-              className="h-10 object-contain"
+              className="h-10 object-contain dark:brightness-110 dark:contrast-110"
             />
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="relative grid h-10 w-10 place-items-center rounded-full border bg-white">
+            <button className="relative grid h-10 w-10 place-items-center rounded-full border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-850 cursor-pointer">
               🔔
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-orange-500" />
             </button>
-            <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-orange-500 to-red-600 text-white font-bold">
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-orange-500 to-red-600 text-white font-extrabold shadow-sm">
               {initial}
             </div>
           </div>
@@ -212,32 +209,32 @@ export default function CartPage() {
       <main className="mx-auto max-w-6xl px-6 py-8">
         {/* TITLE */}
         <div className="mb-6">
-          <p className="text-sm text-gray-500">Dashboard / Your cart</p>
+          <p className="text-xs text-gray-450 dark:text-zinc-500 font-bold uppercase tracking-wider">Dashboard / Your cart</p>
 
-          <div className="mt-2 inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm font-semibold text-orange-600">
+          <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-orange-100 dark:border-orange-900/30 bg-white dark:bg-zinc-900 px-4 py-1.5 text-xs font-bold text-orange-600 dark:text-orange-400 shadow-sm">
             ⏱ Ready in ~12 minutes
           </div>
 
-          <h1 className="mt-4 text-4xl font-extrabold">
-            Your cart, <span className="text-orange-600">{displayName}!</span>
+          <h1 className="mt-4 text-4xl font-black text-gray-950 dark:text-white tracking-tight">
+            Your cart, <span className="text-orange-655 dark:text-orange-500">{displayName}!</span>
           </h1>
 
-          <p className="text-gray-500">{cart.length} bites · Pickup at Main Block Canteen</p>
+          <p className="text-gray-500 dark:text-zinc-450 text-sm font-semibold mt-1">{cart.length} bites</p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
           {/* LEFT */}
           <div>
-            <div className="rounded-3xl border bg-white shadow-md">
-              <div className="flex items-center justify-between border-b px-6 py-4">
-                <h2 className="text-lg font-bold">Items</h2>
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs">
+            <div className="rounded-3xl border border-gray-150/40 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-md">
+              <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 px-6 py-4">
+                <h2 className="text-lg font-bold text-gray-950 dark:text-white">Items</h2>
+                <span className="rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 px-3 py-1 text-xs font-bold">
                   {cart.length} items
                 </span>
               </div>
 
               {cart.length === 0 ? (
-                <div className="p-10 text-center text-gray-500">
+                <div className="p-10 text-center text-gray-500 dark:text-zinc-450 font-medium">
                   Your cart is empty. Start adding delicious bites!
                 </div>
               ) : (
@@ -261,45 +258,25 @@ export default function CartPage() {
               )}
             </div>
 
-            {/* COUPON */}
-            <div className="mt-5 flex items-center gap-3 rounded-2xl border bg-gradient-to-br from-orange-50 to-orange-100 p-4">
-              <input
-                className="flex-1 rounded-full bg-white px-4 py-2 text-sm outline-none"
-                placeholder="Got a code? Try BITE50"
-              />
-              <button className="rounded-full border bg-white px-4 py-2 text-sm font-semibold">
-                Apply
-              </button>
-            </div>
           </div>
 
           {/* RIGHT */}
-          <aside className="h-fit rounded-3xl border bg-white shadow-md">
-            <div className="border-b px-6 py-4">
-              <h2 className="text-lg font-bold">Order summary</h2>
+          <aside className="h-fit rounded-3xl border border-gray-150/40 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-md">
+            <div className="border-b border-gray-100 dark:border-zinc-800 px-6 py-4">
+              <h2 className="text-lg font-bold text-gray-950 dark:text-white">Order summary</h2>
             </div>
 
             <div className="p-6">
-              <div className="flex justify-between text-sm text-gray-500">
+              <div className="flex justify-between text-sm text-gray-500 dark:text-zinc-400 font-medium">
                 <span>Subtotal</span>
-                <span className="font-semibold text-black">₹{subtotal}</span>
+                <span className="font-bold text-black dark:text-white">₹{subtotal}</span>
               </div>
 
-              <div className="mt-2 flex justify-between text-sm text-gray-500">
-                <span>Packing</span>
-                <span className="font-semibold text-black">₹{packing}</span>
-              </div>
-
-              <div className="mt-2 flex justify-between text-sm text-gray-500">
-                <span>GST</span>
-                <span className="font-semibold text-black">₹{gst}</span>
-              </div>
-
-              <div className="my-4 h-px bg-gray-200" />
+              <div className="my-4 h-px bg-gray-200 dark:bg-zinc-800" />
 
               <div className="flex justify-between">
-                <span className="font-bold">Total</span>
-                <span className="text-3xl font-extrabold text-orange-600">
+                <span className="font-bold text-gray-950 dark:text-white">Total</span>
+                <span className="text-3xl font-black text-orange-600 dark:text-orange-400">
                   ₹{cart.length > 0 ? total : 0}
                 </span>
               </div>
@@ -307,23 +284,17 @@ export default function CartPage() {
               <button 
                 onClick={handlePlaceOrder}
                 disabled={cart.length === 0 || placingOrder}
-                className="mt-4 w-full rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 py-4 font-bold text-white shadow-lg disabled:from-gray-300 disabled:to-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all duration-300"
+                className="mt-4 w-full rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 py-4 font-bold text-white shadow-lg disabled:from-gray-300 disabled:to-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
               >
                 {placingOrder ? "Placing Order..." : `Place Order (₹${cart.length > 0 ? total : 0})`}
               </button>
 
-              <div className="mt-4 rounded-2xl bg-gray-100 p-4">
-                <p className="font-semibold">Main Block Canteen</p>
-                <p className="text-xs text-gray-500">
-                  Pickup ready by 12:45 PM · 2 min walk
-                </p>
-              </div>
             </div>
           </aside>
         </div>
       </main>
 
-      <footer className="border-t py-6 text-center text-xs text-gray-500">
+      <footer className="border-t border-gray-100 dark:border-zinc-800 py-6 text-center text-xs text-gray-500 dark:text-zinc-450">
         Green Chilli Cafe · Built for hungry students, by hungry students.
       </footer>
     </div>

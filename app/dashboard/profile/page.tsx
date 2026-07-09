@@ -100,22 +100,22 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FBF6EE] p-6 flex items-center justify-center">
-        <p className="text-lg text-gray-500">Loading profile...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 p-6 flex items-center justify-center">
+        <p className="text-lg text-gray-500 font-semibold animate-pulse">Loading profile...</p>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#FBF6EE] p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 p-6 flex items-center justify-center">
         <p className="text-lg text-gray-500">Profile not found</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FBF6EE] p-6 ">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 p-6 transition-colors duration-300">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* HERO */}

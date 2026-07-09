@@ -9,42 +9,42 @@ import { SignOutButton } from "@clerk/nextjs";
 /* ---------------- HERO ---------------- */
 
 export function ProfileHero({ user }: any) {
-  return (
-    <Card className="mb-6 p-6 rounded-2xl border bg-white shadow-sm">
-      <div className="flex items-start justify-between">
+    return (
+        <Card className="mb-6 p-6 rounded-2xl border border-gray-150/40 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm transition-all duration-300">
+            <div className="flex items-start justify-between">
 
-        {/* LEFT SIDE */}
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {user.name || "Complete your profile"}
-          </h1>
+                {/* LEFT SIDE */}
+                <div>
+                    <h1 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">
+                        {user.name || "Complete your profile"}
+                    </h1>
 
-          <p className="text-sm text-gray-500 mt-1">
-            {user.email}
-          </p>
+                    <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
+                        {user.email}
+                    </p>
 
-          <div className="mt-3 flex items-center gap-2 text-xs text-orange-600">
-            <span className="px-2 py-1 rounded-full bg-orange-50 border border-orange-100">
-              {user.bitePoints || 0} Bite Points
-            </span>
-          </div>
-        </div>
+                    <div className="mt-3 flex items-center gap-2 text-xs text-orange-600 dark:text-orange-400 font-bold">
+                        <span className="px-3 py-1 rounded-full bg-orange-50 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30">
+                            {user.bitePoints || 0} Bite Points
+                        </span>
+                    </div>
+                </div>
 
-        {/* RIGHT SIDE */}
-        <div className="flex flex-col items-end gap-2">
-          <SignOutButton>
-            <button className="px-4 py-2 text-sm font-medium bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-lg hover:opacity-90 transition">
-              Logout
-            </button>
-          </SignOutButton>
+                {/* RIGHT SIDE */}
+                <div className="flex flex-col items-end gap-2">
+                    <SignOutButton>
+                        <button className="px-4 py-2 text-sm font-bold bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-lg hover:opacity-90 transition cursor-pointer">
+                            Logout
+                        </button>
+                    </SignOutButton>
 
-          <p className="text-[10px] text-gray-400">
-            See you again 👋
-          </p>
-        </div>
-      </div>
-    </Card>
-  );
+                    <p className="text-[10px] text-gray-400 dark:text-zinc-500">
+                        See you again 👋
+                    </p>
+                </div>
+            </div>
+        </Card>
+    );
 }
 
 /* ---------------- PERSONAL TAB ---------------- */
@@ -57,20 +57,20 @@ export function PersonalTab({
     onSave,
 }: any) {
     return (
-        <Card className="p-6 rounded-2xl space-y-4">
+        <Card className="p-6 rounded-2xl border border-gray-150/40 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm space-y-4">
             <div className="grid gap-3">
                 <Input
                     value={draft.name}
                     disabled={!editing}
                     onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                    className="h-11"
+                    className="h-11 dark:bg-zinc-900 dark:text-white dark:border-zinc-800 disabled:opacity-50"
                     placeholder="Full name"
                 />
 
                 <Input
                     value={draft.email}
                     disabled={true}
-                    className="h-11 bg-gray-50"
+                    className="h-11 bg-gray-50 dark:bg-zinc-950/50 dark:text-zinc-400 dark:border-zinc-800 disabled:opacity-50"
                     placeholder="Email address"
                 />
 
@@ -78,12 +78,12 @@ export function PersonalTab({
                     value={draft.phone || ""}
                     disabled={!editing}
                     onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
-                    className="h-11"
+                    className="h-11 dark:bg-zinc-900 dark:text-white dark:border-zinc-800 disabled:opacity-50"
                     placeholder="Phone number"
                 />
 
                 <textarea
-                    className="w-full min-h-[90px] border rounded-xl p-3 text-sm bg-white disabled:bg-gray-50"
+                    className="w-full min-h-[90px] border border-gray-200 dark:border-zinc-800 rounded-xl p-3 text-sm bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-100 disabled:bg-gray-50 dark:disabled:bg-zinc-950/50 focus:outline-none focus:ring-2 focus:ring-orange-500/50 disabled:opacity-50 transition-all"
                     disabled={!editing}
                     value={draft.bio}
                     onChange={(e) => setDraft({ ...draft, bio: e.target.value })}
@@ -96,7 +96,7 @@ export function PersonalTab({
                     <>
                         <Button
                             onClick={onSave}
-                            className="bg-black text-white hover:bg-black/80"
+                            className="bg-black hover:bg-black/80 dark:bg-white dark:hover:bg-white/90 dark:text-black font-semibold cursor-pointer"
                         >
                             Save changes
                         </Button>
@@ -104,12 +104,15 @@ export function PersonalTab({
                         <Button
                             variant="outline"
                             onClick={() => setEditing(false)}
+                            className="dark:border-zinc-800 dark:hover:bg-zinc-800 cursor-pointer"
                         >
                             Cancel
                         </Button>
                     </>
                 ) : (
-                    <Button onClick={() => setEditing(true)}>Edit profile</Button>
+                    <Button onClick={() => setEditing(true)} className="dark:bg-white dark:hover:bg-white/90 dark:text-black font-semibold cursor-pointer">
+                        Edit profile
+                    </Button>
                 )}
             </div>
         </Card>
