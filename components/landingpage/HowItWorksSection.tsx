@@ -27,20 +27,20 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section id="tracking" className="py-24 bg-orange-50">
+    <section id="tracking" className="py-24 bg-orange-50/50 dark:bg-zinc-950 transition-colors duration-300">
       <div className="container mx-auto px-4">
         {/* Heading */}
         <div className="text-center mb-14">
-          <span className="text-orange-800 font-semibold">
-            SIMPLE PROCESS
+          <span className="text-orange-800 dark:text-orange-400 font-bold tracking-widest uppercase text-xs">
+            Simple Process
           </span>
 
-          <h2 className="text-4xl md:text-5xl font-bold mt-2">
+          <h2 className="text-4xl md:text-5xl font-black text-gray-950 dark:text-white tracking-tight mt-2">
             Order In Seconds,
-            <span className="text-orange-800"> Pick Up In Minutes</span>
+            <span className="text-orange-850 dark:text-orange-400"> Pick Up In Minutes</span>
           </h2>
 
-          <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-zinc-400 mt-4 max-w-2xl mx-auto font-medium">
             Skip long cafeteria queues and track your food from preparation
             to pickup in real time.
           </p>
@@ -59,7 +59,10 @@ export default function HowItWorksSection() {
                   p-6
                   rounded-2xl
                   border
+                  border-gray-150/40
+                  dark:border-zinc-800/80
                   bg-white
+                  dark:bg-zinc-900
                   shadow-sm
                   hover:shadow-xl
                   hover:-translate-y-2
@@ -68,11 +71,11 @@ export default function HowItWorksSection() {
                   text-center
                 "
               >
-                <div className="w-14 h-14 mx-auto rounded-xl bg-orange-100 flex items-center justify-center mb-4">
-                  <Icon className="w-7 h-7 text-orange-800" />
+                <div className="w-14 h-14 mx-auto rounded-xl bg-orange-100 dark:bg-orange-950/20 flex items-center justify-center mb-4">
+                  <Icon className="w-7 h-7 text-orange-800 dark:text-orange-400" />
                 </div>
 
-                <h3 className="font-semibold text-lg">
+                <h3 className="font-extrabold text-gray-900 dark:text-white text-lg">
                   {step.title}
                 </h3>
               </div>
@@ -81,37 +84,37 @@ export default function HowItWorksSection() {
         </div>
 
         {/* Tracking Card */}
-        <div className="max-w-3xl mx-auto bg-white rounded-3xl p-8 shadow-xl border">
+        <div className="max-w-3xl mx-auto bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-xl border border-gray-150/40 dark:border-zinc-800/80">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-              <h3 className="font-bold text-xl">
+              <h3 className="font-black text-xl text-gray-950 dark:text-white">
                 Order #CB1024
               </h3>
 
-              <p className="text-gray-500">
+              <p className="text-gray-500 dark:text-zinc-450 text-sm font-semibold mt-0.5">
                 Estimated pickup: 5 min
               </p>
             </div>
 
-            <span className="px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-sm font-medium">
+            <span className="px-4 py-1.5 rounded-full bg-orange-100 dark:bg-orange-950/20 text-orange-800 dark:text-orange-400 text-xs font-bold border border-orange-200 dark:border-orange-900/30">
               Preparing
             </span>
           </div>
 
-          <div className="flex justify-between text-sm text-gray-600 mb-3">
+          <div className="flex justify-between text-xs text-gray-600 dark:text-zinc-400 font-bold mb-3">
             <span>Preparing</span>
             <span>Cooking</span>
             <span>Ready</span>
           </div>
 
-          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-            <div className="w-2/3 h-full bg-orange-800 rounded-full transition-all duration-500" />
+          <div className="w-full h-3 bg-gray-200 dark:bg-zinc-850 rounded-full overflow-hidden">
+            <div className="w-2/3 h-full bg-orange-800 dark:bg-orange-600 rounded-full transition-all duration-500" />
           </div>
 
           <div className="mt-8 flex items-center gap-3">
-            <CheckCircle className="text-green-500 w-5 h-5" />
+            <CheckCircle className="text-green-550 dark:text-green-400 w-5 h-5" />
 
-            <p className="text-gray-700">
+            <p className="text-gray-700 dark:text-zinc-300 font-semibold">
               Chef has started preparing your meal.
             </p>
           </div>

@@ -15,7 +15,7 @@ export default function RevenueChart() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-6 shadow-sm h-[400px] flex items-center justify-center text-gray-500 font-semibold animate-pulse border">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm h-[400px] flex items-center justify-center text-gray-500 dark:text-zinc-400 font-semibold animate-pulse border border-gray-150/40 dark:border-zinc-800">
         Loading revenue data...
       </div>
     );
@@ -50,8 +50,8 @@ export default function RevenueChart() {
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm h-[400px] border border-gray-100 hover:shadow-md transition-shadow">
-      <h2 className="font-semibold text-lg mb-4 text-gray-800">
+    <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm h-[400px] border border-gray-100 dark:border-zinc-800/85 hover:shadow-md transition-shadow duration-300">
+      <h2 className="font-bold text-lg mb-4 text-gray-800 dark:text-white transition-colors duration-300">
         Revenue Overview (Last 7 Days)
       </h2>
 
@@ -60,7 +60,14 @@ export default function RevenueChart() {
           <XAxis dataKey="day" stroke="#94a3b8" />
           <YAxis stroke="#94a3b8" />
           <Tooltip 
-            contentStyle={{ backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #e2e8f0" }}
+            contentStyle={{ 
+              backgroundColor: "var(--card, #fff)", 
+              color: "var(--card-foreground, #000)", 
+              borderRadius: "12px", 
+              border: "1px solid var(--border, #e2e8f0)" 
+            }}
+            itemStyle={{ color: "var(--card-foreground, #000)" }}
+            labelStyle={{ color: "var(--muted-foreground, #64748b)" }}
             formatter={(value) => [`₹${value}`, "Revenue"]}
           />
           <Line

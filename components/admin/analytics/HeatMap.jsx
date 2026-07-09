@@ -10,7 +10,7 @@ export default function TrafficHeatmap() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-6 shadow-sm h-[320px] flex items-center justify-center text-gray-500 font-semibold animate-pulse border">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm h-[320px] flex items-center justify-center text-gray-500 dark:text-zinc-400 font-semibold animate-pulse border border-gray-150/40 dark:border-zinc-800">
         Loading traffic heatmap...
       </div>
     );
@@ -54,8 +54,8 @@ export default function TrafficHeatmap() {
   );
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-      <h2 className="font-semibold text-lg mb-6 text-gray-800">
+    <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800/80 hover:shadow-md transition-shadow duration-300">
+      <h2 className="font-bold text-lg mb-6 text-gray-800 dark:text-white transition-colors duration-300">
         Traffic Heatmap (Peak Hours)
       </h2>
 
@@ -66,7 +66,7 @@ export default function TrafficHeatmap() {
             {hours.map((hour) => (
               <div
                 key={hour}
-                className="text-xs text-center font-medium text-gray-500"
+                className="text-xs text-center font-bold text-gray-500 dark:text-zinc-500"
               >
                 {hour.toString().padStart(2, '0')}:00
               </div>
@@ -78,7 +78,7 @@ export default function TrafficHeatmap() {
               key={day}
               className="grid grid-cols-12 gap-2 items-center"
             >
-              <div className="text-sm font-semibold text-gray-600 w-10">
+              <div className="text-sm font-bold text-gray-600 dark:text-zinc-400 w-10">
                 {day}
               </div>
 
@@ -90,16 +90,16 @@ export default function TrafficHeatmap() {
                     title={`${count} orders placed in this hour`}
                     className={`h-8 rounded transition-all duration-300 ${
                       value === 0
-                        ? "bg-slate-50 border border-slate-100"
+                        ? "bg-slate-50 dark:bg-zinc-950/40 border border-slate-100 dark:border-zinc-800/80"
                         : value === 1
-                        ? "bg-orange-100"
+                        ? "bg-orange-100 dark:bg-orange-950/20 text-orange-700"
                         : value === 2
-                        ? "bg-orange-200"
+                        ? "bg-orange-200 dark:bg-orange-900/30"
                         : value === 3
-                        ? "bg-orange-300"
+                        ? "bg-orange-300 dark:bg-orange-700/40"
                         : value === 4
-                        ? "bg-orange-500"
-                        : "bg-orange-700"
+                        ? "bg-orange-500 dark:bg-orange-500"
+                        : "bg-orange-700 dark:bg-orange-600"
                     }`}
                   />
                 );
@@ -108,11 +108,11 @@ export default function TrafficHeatmap() {
           ))}
         </div>
       </div>
-      <div className="mt-4 flex justify-end gap-4 text-xs text-gray-500">
-        <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-slate-50 border rounded" /> 0 orders</div>
-        <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-orange-100 rounded" /> Light</div>
-        <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-orange-300 rounded" /> Moderate</div>
-        <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-orange-700 rounded" /> Busy</div>
+      <div className="mt-4 flex justify-end gap-4 text-xs text-gray-500 dark:text-zinc-500 font-semibold">
+        <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-slate-50 dark:bg-zinc-950/40 border border-slate-200 dark:border-zinc-800 rounded" /> 0 orders</div>
+        <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-orange-100 dark:bg-orange-950/20 rounded" /> Light</div>
+        <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-orange-300 dark:bg-orange-700/40 rounded" /> Moderate</div>
+        <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-orange-700 dark:bg-orange-600 rounded" /> Busy</div>
       </div>
     </div>
   );
